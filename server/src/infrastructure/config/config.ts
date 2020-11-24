@@ -1,5 +1,6 @@
 export class Config {
 	env: HostEnvironment;
+	app: AppConfig;
 	server: ServerConfig;
 }
 
@@ -17,6 +18,10 @@ export class HostEnvironment {
 	get isProduction(): boolean {
 		return this.name === 'production';
 	}
+}
+
+export class AppConfig {
+	bodySizeLimit: string;
 }
 
 export class ServerConfig {

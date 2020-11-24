@@ -11,6 +11,9 @@ export class NodeConfigResolver implements IConfigResolver<NodeJS.ProcessEnv> {
 
 		return {
 			env: new HostEnvironment(environment.NODE_ENV),
+			app: {
+				bodySizeLimit: environment.APP_BODY_SIZE_LIMIT,
+			},
 			server: {
 				port: parseInt(environment.SERVER_PORT, 10),
 				hostname: environment.SERVER_HOST,
@@ -25,6 +28,9 @@ export class NodeConfigResolver implements IConfigResolver<NodeJS.ProcessEnv> {
 	validate(environment: NodeJS.ProcessEnv) {
 		cleanEnv(environment, {
 			NODE_ENV: str(),
+			// App
+			APP_BODY_SIZE_LIMIT: str(),
+			// Server
 			SERVER_PORT: num(),
 			SERVER_HOST: str(),
 		});
