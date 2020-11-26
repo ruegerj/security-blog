@@ -14,6 +14,11 @@ export class NodeConfigResolver implements IConfigResolver<NodeJS.ProcessEnv> {
 			env: new HostEnvironment(environment.NODE_ENV),
 			app: {
 				bodySizeLimit: environment.APP_BODY_SIZE_LIMIT,
+				requestLimitCount: parseInt(environment.APP_REQUEST_LIMIT, 10),
+				requestLimitWindow: parseInt(
+					environment.APP_REQUEST_LIMIT_WINDOW,
+					10
+				),
 			},
 			server: {
 				port: parseInt(environment.SERVER_PORT, 10),

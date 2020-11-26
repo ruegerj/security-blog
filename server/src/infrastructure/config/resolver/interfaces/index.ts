@@ -1,1 +1,1 @@
-export { IConfigResolver } from './configResolver.interface';
+export * from './configResolver.interface';

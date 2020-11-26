@@ -1,4 +1,4 @@
-export { IConfig } from './config.interface';
-export { IHostEnvironment } from './hostEnvironment.interface';
-export { IAppConfig } from './appConfig.interface';
-export { IServerConfig } from './serverConfig.interface';
+export * from './config.interface';
+export * from './hostEnvironment.interface';
+export * from './appConfig.interface';
+export * from './serverConfig.interface';

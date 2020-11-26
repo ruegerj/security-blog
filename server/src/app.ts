@@ -3,20 +3,24 @@ import express from 'express';
 import morgan from 'morgan';
 import { inject, injectable, multiInject } from 'inversify';
 import helmet from 'helmet';
+import rateLimit from 'express-rate-limit';
+import xss from 'xss-clean';
+import hpp from 'hpp';
 import { TypeMap } from './infrastructure/ioc/typeMap';
 import { ControllerBase } from './controllers/';
 import { IConfig } from './infrastructure/config/interfaces';
+import { FailResponse } from './infrastructure/responses';
 
 @injectable()
 export class App {
-	private readonly _config: IConfig;
+	private readonly config: IConfig;
 	private readonly app: express.Application;
 
 	constructor(
 		@multiInject(TypeMap.ControllerBase) controllers: ControllerBase[],
 		@inject(TypeMap.IConfig) config: IConfig
 	) {
-		this._config = config;
+		this.config = config;
 
 		this.app = express();
 
@@ -30,11 +34,11 @@ export class App {
 	 */
 	public listen(): Server {
 		return this.app.listen(
-			this._config.server.port,
-			this._config.server.hostname,
+			this.config.server.port,
+			this.config.server.hostname,
 			() => {
 				console.log(
-					`Security blog server is listening on http://${this._config.server.hostname}:${this._config.server.port}`
+					`Security blog server is listening on http://${this.config.server.hostname}:${this.config.server.port}`
 				);
 			}
 		);
@@ -49,16 +53,45 @@ export class App {
 		this.app.use(helmet());
 
 		// Add request logger for development
-		if (this._config.env.isDevelopment) {
+		if (this.config.env.isDevelopment) {
 			this.app.use(morgan('dev'));
 		}
+
+		// Apply rate limiting for api endpoints
+		const rateLimitFail = new FailResponse(
+			`There were too many request from your IP, please try again in ${
+				this.config.app.requestLimitWindow / 1000 / 60
+			} minutes`
+		);
+
+		const limiter = rateLimit({
+			max: this.config.app.requestLimitCount,
+			windowMs: this.config.app.requestLimitWindow,
+			message: JSON.stringify(rateLimitFail),
+		});
+
+		this.app.use('/api', limiter);
 
 		// Limit allowed body size
 		this.app.use(
 			express.json({
-				limit: this._config.app.bodySizeLimit,
+				limit: this.config.app.bodySizeLimit,
 			})
 		);
+
+		// Limit url encoded body size
+		this.app.use(
+			express.urlencoded({
+				extended: true,
+				limit: this.config.app.bodySizeLimit,
+			})
+		);
+
+		// Request sanitization against XSS
+		this.app.use(xss());
+
+		// Prevent HTTP parameter pollution
+		this.app.use(hpp());
 	}
 
 	/**

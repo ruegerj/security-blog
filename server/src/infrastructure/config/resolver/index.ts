@@ -1,2 +1,2 @@
-export { IConfigResolver } from './interfaces/configResolver.interface';
-export { NodeConfigResolver } from './nodeConfigResolver';
+export * from './interfaces/configResolver.interface';
+export * from './nodeConfigResolver';

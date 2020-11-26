@@ -1,2 +1,2 @@
-export { container } from './container.config';
-export { TypeMap } from './typeMap';
+export * from './container.config';
+export * from './typeMap';

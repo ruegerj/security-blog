@@ -8,5 +8,3 @@ export const TypeMap = {
 	ControllerBase: Symbol.for('ControllerBase'),
 	App: Symbol.for('App'),
 };
-
-// export { TypeMap };
