@@ -18,7 +18,7 @@ export class App {
 
 	constructor(
 		@multiInject(TypeMap.ControllerBase) controllers: ControllerBase[],
-		@inject(TypeMap.IConfig) config: IConfig
+		@inject(TypeMap.IConfig) config: IConfig,
 	) {
 		this.config = config;
 
@@ -38,9 +38,9 @@ export class App {
 			this.config.server.hostname,
 			() => {
 				console.log(
-					`Security blog server is listening on http://${this.config.server.hostname}:${this.config.server.port}`
+					`Security blog server is listening on http://${this.config.server.hostname}:${this.config.server.port}`,
 				);
-			}
+			},
 		);
 	}
 
@@ -61,7 +61,7 @@ export class App {
 		const rateLimitFail = new FailResponse(
 			`There were too many request from your IP, please try again in ${
 				this.config.app.requestLimitWindow / 1000 / 60
-			} minutes`
+			} minutes`,
 		);
 
 		const limiter = rateLimit({
@@ -76,7 +76,7 @@ export class App {
 		this.app.use(
 			express.json({
 				limit: this.config.app.bodySizeLimit,
-			})
+			}),
 		);
 
 		// Limit url encoded body size
@@ -84,7 +84,7 @@ export class App {
 			express.urlencoded({
 				extended: true,
 				limit: this.config.app.bodySizeLimit,
-			})
+			}),
 		);
 
 		// Request sanitization against XSS

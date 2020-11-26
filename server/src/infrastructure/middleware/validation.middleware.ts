@@ -10,7 +10,7 @@ import { ValidationFailedError } from '../errors';
  */
 export function validate<TModel>(
 	type: any,
-	skipMissingProperties = false
+	skipMissingProperties = false,
 ): RequestHandler {
 	return async (req, res, next) => {
 		const parsedBody = plainToClass<TModel, unknown>(type, req.body);
@@ -28,7 +28,7 @@ export function validate<TModel>(
 
 		for (const validationError of errors) {
 			errorRecord[validationError.property] = Object.values(
-				validationError.constraints
+				validationError.constraints,
 			);
 		}
 
@@ -36,7 +36,7 @@ export function validate<TModel>(
 		next(
 			new ValidationFailedError({
 				errors: errorRecord,
-			})
+			}),
 		);
 	};
 }

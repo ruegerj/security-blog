@@ -5,10 +5,10 @@ export function errorHandler(
 	error: HttpError,
 	req: Request,
 	res: Response,
-	next: NextFunction
+	next: NextFunction,
 ) {
 	const statusCode = error.status || 500;
 
-	let message = 'Something went wrong...'; // Generic error message as default
-	let payload: any = null;
+	const message = 'Something went wrong...'; // Generic error message as default
+	const payload: any = null;
 }

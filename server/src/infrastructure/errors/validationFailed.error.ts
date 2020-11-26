@@ -10,7 +10,7 @@ export class ValidationFailedError extends HttpError<ValidationFailedDto> {
 		super(
 			HttpStatusCode.UnprocessableEntity,
 			'Validation has failed',
-			model
+			model,
 		);
 	}
 }

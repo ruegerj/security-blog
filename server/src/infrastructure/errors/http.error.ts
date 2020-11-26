@@ -13,7 +13,7 @@ export class HttpError<TData = any> extends Error {
 	constructor(
 		public status: HttpStatusCode,
 		public message: string,
-		public data?: TData
+		public data?: TData,
 	) {
 		super(message);
 

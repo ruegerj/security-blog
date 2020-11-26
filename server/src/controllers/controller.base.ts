@@ -37,9 +37,9 @@ export abstract class ControllerBase {
 		handler: (
 			req: Request,
 			res: Response,
-			next: NextFunction
+			next: NextFunction,
 		) => Promise<any>,
-		scope: ControllerBase
+		scope: ControllerBase,
 	): RequestHandler {
 		return (req: Request, res: Response, next: NextFunction) => {
 			handler.call(scope, req, res, next).catch(next);

@@ -17,7 +17,7 @@ export class NodeConfigResolver implements IConfigResolver<NodeJS.ProcessEnv> {
 				requestLimitCount: parseInt(environment.APP_REQUEST_LIMIT, 10),
 				requestLimitWindow: parseInt(
 					environment.APP_REQUEST_LIMIT_WINDOW,
-					10
+					10,
 				),
 			},
 			server: {

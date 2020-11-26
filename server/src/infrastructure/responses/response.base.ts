@@ -13,7 +13,7 @@ export abstract class ResponseBase<TData> {
 	constructor(
 		state: ResponseState,
 		readonly message: string = undefined,
-		readonly data: TData = undefined
+		readonly data: TData = undefined,
 	) {
 		this.status = this.getStatus(state);
 	}
