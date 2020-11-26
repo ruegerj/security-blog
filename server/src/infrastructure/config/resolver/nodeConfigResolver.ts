@@ -1,6 +1,7 @@
 import { cleanEnv, num, str } from 'envalid';
-import { Config, HostEnvironment } from '../config';
-import { IConfigResolver } from './configResolver.interface';
+import { Config } from '../config';
+import { HostEnvironment } from '../hostEnvironment';
+import { IConfigResolver } from './interfaces/configResolver.interface';
 
 /**
  * Node specific implmentation of @see {IConfigResolver}

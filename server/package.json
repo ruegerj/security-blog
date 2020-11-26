@@ -37,6 +37,8 @@
 		"envalid": "^6.0.2",
 		"express": "^4.17.1",
 		"helmet": "^4.2.0",
-		"morgan": "^1.10.0"
+		"inversify": "^5.0.1",
+		"morgan": "^1.10.0",
+		"reflect-metadata": "^0.1.13"
 	}
 }

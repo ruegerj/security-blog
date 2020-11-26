@@ -1,6 +1,5 @@
 import { App } from './app';
-import { ControllerBase } from './controllers';
-import { NodeConfigResolver } from './infrastructure/config';
+import { TypeMap, container } from './infrastructure/ioc';
 
 // Global handler for uncaught exceptions
 process.on('uncaughtException', (err) => {
@@ -10,15 +9,8 @@ process.on('uncaughtException', (err) => {
 	process.exit(1);
 });
 
-// Resolve config from environment
-const configResolver = new NodeConfigResolver();
-const config = configResolver.resolve(process.env);
-
-// Register controllers
-const controllers: ControllerBase[] = [];
-
 // Setup & start app
-const app = new App(controllers, config);
+const app = container.get<App>(TypeMap.App);
 const server = app.listen();
 
 // Global handler for promise rejections

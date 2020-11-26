@@ -1,17 +1,23 @@
 import { Server } from 'http';
 import express from 'express';
 import morgan from 'morgan';
+import { inject, injectable, multiInject } from 'inversify';
 import helmet from 'helmet';
+import { TypeMap } from './infrastructure/ioc/typeMap';
 import { ControllerBase } from './controllers/';
-import { Config } from './infrastructure/config';
+import { IConfig } from './infrastructure/config/interfaces';
 
+@injectable()
 export class App {
+	private readonly _config: IConfig;
 	private readonly app: express.Application;
 
 	constructor(
-		controllers: ControllerBase[],
-		private readonly _config: Config
+		@multiInject(TypeMap.ControllerBase) controllers: ControllerBase[],
+		@inject(TypeMap.IConfig) config: IConfig
 	) {
+		this._config = config;
+
 		this.app = express();
 
 		this.initializeMiddleware();

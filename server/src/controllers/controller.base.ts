@@ -1,8 +1,16 @@
-import { NextFunction, Request, RequestHandler, Response, Router } from 'express';
+import {
+	NextFunction,
+	Request,
+	RequestHandler,
+	Response,
+	Router,
+} from 'express';
+import { injectable } from 'inversify';
 
 /**
  * Base class for any controller implementation
  */
+@injectable()
 export abstract class ControllerBase {
 	readonly router = Router();
 
@@ -25,9 +33,16 @@ export abstract class ControllerBase {
 	 * @param handler Async handler function whose errors should be caught
 	 * @param scope Derived controller class which acts as the scope which the wrapped handler is called with (this arg)
 	 */
-	protected catch(handler: (req: Request, res: Response, next: NextFunction) => Promise<any>, scope: ControllerBase): RequestHandler {
+	protected catch(
+		handler: (
+			req: Request,
+			res: Response,
+			next: NextFunction
+		) => Promise<any>,
+		scope: ControllerBase
+	): RequestHandler {
 		return (req: Request, res: Response, next: NextFunction) => {
 			handler.call(scope, req, res, next).catch(next);
-		}
+		};
 	}
 }

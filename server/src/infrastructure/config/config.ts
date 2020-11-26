@@ -1,30 +1,10 @@
-export class Config {
+import { injectable } from 'inversify';
+import { IAppConfig, IConfig, IServerConfig } from './interfaces';
+import { HostEnvironment } from './hostEnvironment';
+
+@injectable()
+export class Config implements IConfig {
 	env: HostEnvironment;
-	app: AppConfig;
-	server: ServerConfig;
-}
-
-export class HostEnvironment {
-	constructor(public name: string) {}
-
-	get isDevelopment(): boolean {
-		return this.name === 'development';
-	}
-
-	get isTesting(): boolean {
-		return this.name === 'testing';
-	}
-
-	get isProduction(): boolean {
-		return this.name === 'production';
-	}
-}
-
-export class AppConfig {
-	bodySizeLimit: string;
-}
-
-export class ServerConfig {
-	hostname: string;
-	port: number;
+	app: IAppConfig;
+	server: IServerConfig;
 }
