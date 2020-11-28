@@ -5,12 +5,10 @@ import {
 	Response,
 	Router,
 } from 'express';
-import { injectable } from 'inversify';
 
 /**
  * Base class for any controller implementation
  */
-@injectable()
 export abstract class ControllerBase {
 	readonly router = Router();
 

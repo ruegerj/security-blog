@@ -1,5 +1,7 @@
+import Container from 'typedi';
 import { App } from './app';
-import { TypeMap, container } from './infrastructure/ioc';
+import { NodeConfigResolver } from './infrastructure/config';
+import { Tokens } from './infrastructure/ioc';
 
 // Global handler for uncaught exceptions
 process.on('uncaughtException', (err) => {
@@ -9,8 +11,20 @@ process.on('uncaughtException', (err) => {
 	process.exit(1);
 });
 
+// Register config in ioc
+const configResolver = new NodeConfigResolver();
+const config = configResolver.resolve(process.env);
+
+Container.set({
+	id: Tokens.IConfig,
+	value: config,
+});
+
+// Import controllers in order to ensure that they're registere
+Container.import([]);
+
 // Setup & start app
-const app = container.get<App>(TypeMap.App);
+const app = Container.get(App);
 const server = app.listen();
 
 // Global handler for promise rejections

@@ -1,24 +1,25 @@
 import { Server } from 'http';
+import 'reflect-metadata';
 import express from 'express';
 import morgan from 'morgan';
-import { inject, injectable, multiInject } from 'inversify';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import xss from 'xss-clean';
 import hpp from 'hpp';
-import { TypeMap } from './infrastructure/ioc/typeMap';
 import { ControllerBase } from './controllers/';
 import { IConfig } from './infrastructure/config/interfaces';
 import { FailResponse } from './infrastructure/responses';
+import { Inject, InjectMany, Service } from 'typedi';
+import { Tokens } from './infrastructure/ioc';
 
-@injectable()
+@Service()
 export class App {
 	private readonly config: IConfig;
 	private readonly app: express.Application;
 
 	constructor(
-		@multiInject(TypeMap.ControllerBase) controllers: ControllerBase[],
-		@inject(TypeMap.IConfig) config: IConfig,
+		@InjectMany(Tokens.ControllerBase) controllers: ControllerBase[],
+		@Inject(Tokens.IConfig) config: IConfig,
 	) {
 		this.config = config;
 

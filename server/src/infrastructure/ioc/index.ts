@@ -1,2 +1,1 @@
-export * from './container.config';
-export * from './typeMap';
+export * from './tokens';

@@ -13,8 +13,9 @@
 		"outDir": "dist",
 		"baseUrl": ".",
 		"paths": {
-			"*": ["node_modules/*"]
+			"*": ["node_modules/*"],
+			"xss-clean": ["src/types/packages/xss-clean.d.ts"]
 		}
 	},
-	"include": ["src/**/*"]
+	"include": ["src/types/*.d.ts", "src/**/*"],
 }
