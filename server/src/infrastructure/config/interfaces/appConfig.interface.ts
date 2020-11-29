@@ -16,4 +16,9 @@ export interface IAppConfig {
 	 * Time window for which the request limit is applied (in MS)
 	 */
 	requestLimitWindow: number;
+
+	/**
+	 * Max size a log file can have before a new one should be created
+	 */
+	logfileSize: number;
 }

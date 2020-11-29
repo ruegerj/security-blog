@@ -11,15 +11,19 @@ import { IConfig } from './infrastructure/config/interfaces';
 import { FailResponse } from './infrastructure/responses';
 import { Inject, InjectMany, Service } from 'typedi';
 import { Tokens } from './infrastructure/ioc';
+import { ILogger } from './infrastructure/logger/interfaces';
 
 @Service()
 export class App {
-	private readonly config: IConfig;
 	private readonly app: express.Application;
 
 	constructor(
-		@InjectMany(Tokens.ControllerBase) controllers: ControllerBase[],
-		@Inject(Tokens.IConfig) config: IConfig,
+		@InjectMany(Tokens.ControllerBase)
+		controllers: ControllerBase[],
+		@Inject(Tokens.IConfig)
+		private readonly config: IConfig,
+		@Inject(Tokens.ILogger)
+		private readonly logger: ILogger,
 	) {
 		this.config = config;
 
@@ -38,7 +42,7 @@ export class App {
 			this.config.server.port,
 			this.config.server.hostname,
 			() => {
-				console.log(
+				this.logger.info(
 					`Security blog server is listening on http://${this.config.server.hostname}:${this.config.server.port}`,
 				);
 			},
@@ -54,9 +58,8 @@ export class App {
 		this.app.use(helmet());
 
 		// Add request logger for development
-		if (this.config.env.isDevelopment) {
-			this.app.use(morgan('dev'));
-		}
+		const morganFormat = this.config.env.isDevelopment ? 'dev' : 'combined';
+		this.app.use(morgan(morganFormat, { stream: this.logger.stream() }));
 
 		// Apply rate limiting for api endpoints
 		const rateLimitFail = new FailResponse(

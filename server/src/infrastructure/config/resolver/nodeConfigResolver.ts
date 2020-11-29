@@ -1,3 +1,4 @@
+import getAppDataPath from 'appdata-path';
 import { cleanEnv, num, str } from 'envalid';
 import { Config } from '../config';
 import { HostEnvironment } from '../hostEnvironment';
@@ -19,10 +20,12 @@ export class NodeConfigResolver implements IConfigResolver<NodeJS.ProcessEnv> {
 					environment.APP_REQUEST_LIMIT_WINDOW,
 					10,
 				),
+				logfileSize: parseInt(environment.APP_LOG_SIZE, 10),
 			},
 			server: {
 				port: parseInt(environment.SERVER_PORT, 10),
 				hostname: environment.SERVER_HOST,
+				appDataLocation: getAppDataPath('security-blog'),
 			},
 		};
 	}
@@ -38,6 +41,7 @@ export class NodeConfigResolver implements IConfigResolver<NodeJS.ProcessEnv> {
 			APP_BODY_SIZE_LIMIT: str(),
 			APP_REQUEST_LIMIT: num(),
 			APP_REQUEST_LIMIT_WINDOW: num(),
+			APP_LOG_SIZE: num(),
 			// Server
 			SERVER_PORT: num(),
 			SERVER_HOST: str(),

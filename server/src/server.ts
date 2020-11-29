@@ -2,6 +2,7 @@ import Container from 'typedi';
 import { App } from './app';
 import { NodeConfigResolver } from './infrastructure/config';
 import { Tokens } from './infrastructure/ioc';
+import { WinstonLogger } from './infrastructure/logger/winstonLogger';
 
 // Global handler for uncaught exceptions
 process.on('uncaughtException', (err) => {
@@ -20,8 +21,8 @@ Container.set({
 	value: config,
 });
 
-// Import controllers in order to ensure that they're registere
-Container.import([]);
+// Import depedencies of "App" in order to ensure that they're getting registered
+Container.import([WinstonLogger]);
 
 // Setup & start app
 const app = Container.get(App);
