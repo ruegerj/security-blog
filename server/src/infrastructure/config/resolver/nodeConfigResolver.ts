@@ -31,11 +31,13 @@ export class NodeConfigResolver implements IConfigResolver<NodeJS.ProcessEnv> {
 	 * Validates if all required env variables are present and have the correct type
 	 * @returns void or fails if env var isn't present or has incorrect type
 	 */
-	validate(environment: NodeJS.ProcessEnv) {
+	validate(environment: NodeJS.ProcessEnv): void {
 		cleanEnv(environment, {
 			NODE_ENV: str(),
 			// App
 			APP_BODY_SIZE_LIMIT: str(),
+			APP_REQUEST_LIMIT: num(),
+			APP_REQUEST_LIMIT_WINDOW: num(),
 			// Server
 			SERVER_PORT: num(),
 			SERVER_HOST: str(),
