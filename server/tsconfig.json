@@ -14,7 +14,7 @@
 		"baseUrl": ".",
 		"paths": {
 			"*": ["node_modules/*"],
-			"xss-clean": ["src/types/packages/xss-clean.d.ts"]
+			"xss-clean": ["src/types/index.d.ts"]
 		}
 	},
 	"include": ["src/types/*.d.ts", "src/**/*"],
