@@ -21,4 +21,9 @@ export interface IAppConfig {
 	 * Max size a log file can have before a new one should be created
 	 */
 	logfileSize: number;
+
+	/**
+	 * Max lag which is allowed for the event loop in ms
+	 */
+	maxLag: number;
 }

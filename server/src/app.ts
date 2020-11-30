@@ -12,6 +12,7 @@ import { FailResponse } from './infrastructure/responses';
 import { Inject, InjectMany, Service } from 'typedi';
 import { Tokens } from './infrastructure/ioc';
 import { ILogger } from './infrastructure/logger/interfaces';
+import { loadHandler } from './infrastructure/middleware';
 
 @Service()
 export class App {
@@ -57,7 +58,7 @@ export class App {
 		// Set security http headers
 		this.app.use(helmet());
 
-		// Add request logger for development
+		// Add request logger
 		const morganFormat = this.config.env.isDevelopment ? 'dev' : 'combined';
 		this.app.use(morgan(morganFormat, { stream: this.logger.stream() }));
 
@@ -75,6 +76,9 @@ export class App {
 		});
 
 		this.app.use('/api', limiter);
+
+		// Add event loop monitoring and load handling
+		this.app.use(loadHandler(this.config, this.logger));
 
 		// Limit allowed body size
 		this.app.use(
