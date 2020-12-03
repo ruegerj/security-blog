@@ -2,5 +2,5 @@
 	"watch": ["src"],
 	"ext": "ts,json",
 	"ignore": ["src/**/*.spec.ts"],
-	"exec": "ts-node -r dotenv/config ./src/server.ts dotenv_config_path=./src/configurations/config.dev.env"
+	"exec": "ts-node -r dotenv-with-expand/config ./src/server.ts dotenv_config_path=./src/configurations/config.dev.env"
 }

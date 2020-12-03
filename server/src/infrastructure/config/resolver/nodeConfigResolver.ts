@@ -22,11 +22,11 @@ export class NodeConfigResolver implements IConfigResolver<NodeJS.ProcessEnv> {
 				),
 				logfileSize: parseInt(environment.APP_LOG_SIZE, 10),
 				maxLag: parseInt(environment.APP_MAX_LAG, 10),
+				dataLocation: environment.APP_DATA_DIR,
 			},
 			server: {
 				port: parseInt(environment.SERVER_PORT, 10),
 				hostname: environment.SERVER_HOST,
-				appDataLocation: getAppDataPath('security-blog'),
 			},
 		};
 	}
@@ -44,6 +44,7 @@ export class NodeConfigResolver implements IConfigResolver<NodeJS.ProcessEnv> {
 			APP_REQUEST_LIMIT_WINDOW: num(),
 			APP_LOG_SIZE: num(),
 			APP_MAX_LAG: num(),
+			APP_DATA_DIR: str(),
 			// Server
 			SERVER_PORT: num(),
 			SERVER_HOST: str(),

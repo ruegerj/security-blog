@@ -11,9 +11,4 @@ export interface IServerConfig {
 	 * Port of the server
 	 */
 	port: number;
-
-	/**
-	 * Path to appdata dir on the current host
-	 */
-	appDataLocation: string;
 }

@@ -26,4 +26,9 @@ export interface IAppConfig {
 	 * Max lag which is allowed for the event loop in ms
 	 */
 	maxLag: number;
+
+	/**
+	 * Path to the directory for storing data (%APPDATA/..) for this application
+	 */
+	dataLocation: string;
 }

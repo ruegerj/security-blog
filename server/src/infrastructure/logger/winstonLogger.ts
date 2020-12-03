@@ -84,10 +84,7 @@ export class WinstonLogger implements ILogger {
 				`${info.timestamp} ${info.level} [${info.label}]: ${info.message}`,
 		);
 
-		const logfileLocation = path.join(
-			this.config.server.appDataLocation,
-			'logs',
-		);
+		const logfileLocation = path.join(this.config.app.dataLocation, 'logs');
 
 		return createLogger({
 			level: minimalLevel,

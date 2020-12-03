@@ -9,7 +9,7 @@
 		"clean": "rimraf ./dist/*",
 		"build": "tsc && npm run copy-files",
 		"rebuild": "npm run clean && npm run build",
-		"start": "node -r dotenv/config . dotenv_config_path=./dist/configurations/config.dev.env",
+		"start": "node -r dotenv-with-expand/config . dotenv_config_path=./dist/configurations/config.dev.env",
 		"start:dev": "nodemon"
 	},
 	"repository": {
@@ -38,6 +38,7 @@
 		"@types/hpp": "^0.2.1",
 		"@types/morgan": "^1.9.2",
 		"@types/toobusy-js": "^0.5.2",
+		"@types/uuid": "^8.3.0",
 		"@typescript-eslint/eslint-plugin": "^4.8.2",
 		"@typescript-eslint/parser": "^4.8.2",
 		"copyfiles": "^2.4.0",
@@ -57,8 +58,8 @@
 		"appdata-path": "^1.0.0",
 		"class-transformer": "^0.3.1",
 		"class-validator": "^0.12.2",
-		"dotenv": "^8.2.0",
 		"dotenv-expand": "^5.1.0",
+		"dotenv-with-expand": "^1.0.1",
 		"envalid": "^6.0.2",
 		"express": "^4.17.1",
 		"express-rate-limit": "^5.2.3",
@@ -66,8 +67,10 @@
 		"hpp": "^0.2.3",
 		"morgan": "^1.10.0",
 		"reflect-metadata": "^0.1.13",
+		"sqlite3": "^5.0.0",
 		"toobusy-js": "^0.5.1",
 		"typedi": "^0.8.0",
+		"typeorm": "^0.2.29",
 		"winston": "^3.3.3",
 		"xss-clean": "^0.1.1"
 	}
