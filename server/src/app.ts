@@ -54,10 +54,6 @@ export class App {
 	 * Adds the middlware components to the express stack
 	 */
 	private initializeMiddleware() {
-		// TODO: configure
-		// Set security http headers
-		this.app.use(helmet());
-
 		// Add request logger
 		const morganFormat = this.config.env.isDevelopment ? 'dev' : 'combined';
 		this.app.use(morgan(morganFormat, { stream: this.logger.stream() }));
@@ -92,6 +88,23 @@ export class App {
 			express.urlencoded({
 				extended: true,
 				limit: this.config.app.bodySizeLimit,
+			}),
+		);
+
+		// Set security http headers
+		// For config see: https://helmetjs.github.io/
+		this.app.use(helmet());
+
+		// Set and configure content security policy
+		this.app.use(
+			helmet.contentSecurityPolicy({
+				directives: {
+					defaultSrc: ["'self'"], // Default value for all directives that are absent
+					scriptSrc: ["'self'"], // Scripts shall only be loaded from own domain
+					frameAncestors: ["'none'"], // Deny frame representations on any domain
+					imgSrc: ["'self'"], // Img's shall only be loaded from own domain
+					styleSrc: ["'self'"], // Styles shall only be loaded from own domain
+				},
 			}),
 		);
 
