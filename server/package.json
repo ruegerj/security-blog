@@ -58,7 +58,6 @@
 		"appdata-path": "^1.0.0",
 		"class-transformer": "^0.3.1",
 		"class-validator": "^0.12.2",
-		"dotenv-expand": "^5.1.0",
 		"dotenv-with-expand": "^1.0.1",
 		"envalid": "^6.0.2",
 		"express": "^4.17.1",
