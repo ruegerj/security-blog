@@ -1,4 +1,10 @@
-import { Column, Entity, ManyToMany, PrimaryGeneratedColumn } from 'typeorm';
+import {
+	Column,
+	Entity,
+	Index,
+	ManyToMany,
+	PrimaryGeneratedColumn,
+} from 'typeorm';
 import { User } from './user';
 
 /**
@@ -6,6 +12,7 @@ import { User } from './user';
  */
 @Entity()
 export class Role {
+	@Index({ unique: true })
 	@PrimaryGeneratedColumn('uuid')
 	id: string;
 
@@ -18,6 +25,8 @@ export class Role {
 	/**
 	 * Collection of all roles which are assigned to this role
 	 */
-	@ManyToMany((type) => User, (user) => user.id)
+	@ManyToMany((type) => User, (user) => user.id, {
+		onDelete: 'RESTRICT',
+	})
 	users: User[];
 }

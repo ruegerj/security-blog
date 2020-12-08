@@ -1,6 +1,7 @@
 import {
 	Column,
 	Entity,
+	Index,
 	JoinColumn,
 	ManyToOne,
 	PrimaryGeneratedColumn,
@@ -10,6 +11,7 @@ import { User } from './user';
 
 @Entity()
 export class Comment {
+	@Index({ unique: true })
 	@PrimaryGeneratedColumn('uuid')
 	id: string;
 
@@ -35,6 +37,8 @@ export class Comment {
 	/**
 	 * Post which this comment is attached to
 	 */
-	@ManyToOne((type) => Post, (post) => post.comments)
+	@ManyToOne((type) => Post, (post) => post.comments, {
+		onDelete: 'CASCADE',
+	})
 	post: Post;
 }

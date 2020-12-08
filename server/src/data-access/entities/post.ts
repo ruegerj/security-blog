@@ -1,6 +1,7 @@
 import {
 	Column,
 	Entity,
+	Index,
 	JoinColumn,
 	ManyToOne,
 	OneToMany,
@@ -14,6 +15,7 @@ import { User } from './user';
  */
 @Entity()
 export class Post {
+	@Index({ unique: true })
 	@PrimaryGeneratedColumn('uuid')
 	id: string;
 
@@ -26,13 +28,16 @@ export class Post {
 	/**
 	 * Status of this post (index of enum)
 	 */
+	@Index()
 	@Column('integer')
 	status: PostType;
 
 	/**
 	 * Author of this post
 	 */
-	@ManyToOne((type) => User, (user) => user.posts)
+	@ManyToOne((type) => User, (user) => user.posts, {
+		onDelete: 'RESTRICT',
+	})
 	@JoinColumn()
 	author: User;
 

@@ -1,4 +1,4 @@
-import { Column, Entity, ManyToOne, PrimaryColumn } from 'typeorm';
+import { Column, Entity, Index, ManyToOne, PrimaryColumn } from 'typeorm';
 import { User } from './user';
 
 /**
@@ -9,6 +9,7 @@ export class SmsToken {
 	/**
 	 * Token which was issued, serves also as primary key
 	 */
+	@Index()
 	@PrimaryColumn('text')
 	token: string;
 
@@ -19,8 +20,16 @@ export class SmsToken {
 	issuedAt: Date;
 
 	/**
+	 * Was the token ever redeemed by the user
+	 */
+	@Column('integer')
+	redeemed: boolean;
+
+	/**
 	 * User which this token is assigned to
 	 */
-	@ManyToOne((type) => User, (user) => user.tokens)
+	@ManyToOne((type) => User, (user) => user.tokens, {
+		onDelete: 'CASCADE',
+	})
 	user: User;
 }

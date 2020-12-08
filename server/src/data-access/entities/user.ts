@@ -1,6 +1,7 @@
 import {
 	Column,
 	Entity,
+	Index,
 	JoinColumn,
 	JoinTable,
 	ManyToMany,
@@ -18,18 +19,21 @@ import { SmsToken } from './smsToken';
  */
 @Entity()
 export class User {
+	@Index({ unique: true })
 	@PrimaryGeneratedColumn('uuid')
 	id: string;
 
 	/**
 	 * Email of the user
 	 */
+	@Index()
 	@Column('text')
 	email: string;
 
 	/**
 	 * Phone number of the user
 	 */
+	@Index()
 	@Column('text')
 	phone: string;
 
@@ -54,7 +58,9 @@ export class User {
 	/**
 	 * Collection of all roles which are assigned to this user
 	 */
-	@ManyToMany((type) => Role, (role) => role.id)
+	@ManyToMany((type) => Role, (role) => role.id, {
+		onDelete: 'RESTRICT',
+	})
 	@JoinTable()
 	roles: Role[];
 

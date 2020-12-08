@@ -1,4 +1,10 @@
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+	Column,
+	Entity,
+	Index,
+	ManyToOne,
+	PrimaryGeneratedColumn,
+} from 'typeorm';
 import { User } from './user';
 
 /**
@@ -6,12 +12,14 @@ import { User } from './user';
  */
 @Entity()
 export class LoginAttempt {
+	@Index({ unique: true })
 	@PrimaryGeneratedColumn('uuid')
 	id: string;
 
 	/**
 	 * Timestamp of the attempt
 	 */
+	@Index()
 	@Column('integer')
 	timestamp: Date;
 
@@ -24,6 +32,8 @@ export class LoginAttempt {
 	/**
 	 * User which issued the login attempt
 	 */
-	@ManyToOne((type) => User, (user) => user.loginAttemtps)
+	@ManyToOne((type) => User, (user) => user.loginAttemtps, {
+		onDelete: 'CASCADE',
+	})
 	user: User;
 }
