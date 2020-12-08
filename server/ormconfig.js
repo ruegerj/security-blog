@@ -10,6 +10,7 @@ module.exports = {
 	logging: process.env.TYPEORM_LOGGING,
 	synchronize: process.env.TYPEORM_SYNCHRONIZE,
 	migrations: [process.env.TYPEORM_MIGRATIONS],
+	migrationsTableName: process.env.TYPEORM_MIGRATIONS_TABLE_NAME,
 	entities: [process.env.TYPEORM_ENTITIES],
 	cli: {
 		migrationsDir: process.env.TYPEORM_MIGRATIONS_DIR,

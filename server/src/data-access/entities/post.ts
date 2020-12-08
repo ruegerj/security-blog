@@ -27,7 +27,7 @@ export class Post {
 	 * Status of this post (index of enum)
 	 */
 	@Column('integer')
-	status: number;
+	status: PostType;
 
 	/**
 	 * Author of this post
@@ -42,4 +42,24 @@ export class Post {
 	@OneToMany((type) => Comment, (comment) => comment.post)
 	@JoinColumn()
 	comments: Comment[];
+}
+
+/**
+ * Defines all possible states a post can have
+ */
+export enum PostType {
+	/**
+	 * The post is published and visible for all users
+	 */
+	Published,
+
+	/**
+	 * The post is hidden and only visible for the author and admins
+	 */
+	Hidden,
+
+	/**
+	 * The post is deleted and won't be shown on ui
+	 */
+	Deleted,
 }
