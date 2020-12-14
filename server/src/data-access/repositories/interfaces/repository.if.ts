@@ -1,7 +1,9 @@
+import { IEntity } from '@data-access/entities/interfaces';
+
 /**
  * Interface for a generic repository
  */
-export interface IRepository<TEntity> {
+export interface IRepository<TEntity extends IEntity> {
 	/**
 	 * Implementation should return all items of this entity
 	 */

@@ -1,4 +1,10 @@
-import { Column, Entity, Index, ManyToOne, PrimaryColumn } from 'typeorm';
+import {
+	Column,
+	Entity,
+	Index,
+	ManyToOne,
+	PrimaryGeneratedColumn,
+} from 'typeorm';
 import { User } from './user';
 
 /**
@@ -6,11 +12,15 @@ import { User } from './user';
  */
 @Entity()
 export class SmsToken {
+	@Index({ unique: true })
+	@PrimaryGeneratedColumn('uuid')
+	id: string;
+
 	/**
-	 * Token which was issued, serves also as primary key
+	 * Token which was issued
 	 */
 	@Index()
-	@PrimaryColumn('text')
+	@Column('text')
 	token: string;
 
 	/**
