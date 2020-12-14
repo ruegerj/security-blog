@@ -13,6 +13,10 @@
 		"outDir": "dist",
 		"baseUrl": ".",
 		"paths": {
+			"@controllers/*": ["src/controllers/*"],
+			"@infrastructure/*": ["src/infrastructure/*"],
+			"@domain/*": ["src/domain/*"],
+			"@data-access/*": ["src/data-access/*"],
 			"*": ["node_modules/*"],
 			"xss-clean": ["src/types/index.d.ts"]
 		}

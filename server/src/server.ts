@@ -1,4 +1,6 @@
 import Container from 'typedi';
+import 'module-alias/register'; // Setup path aliases
+
 import { App } from './app';
 import { NodeConfigResolver } from './infrastructure/config';
 import { Tokens } from './infrastructure/ioc';
