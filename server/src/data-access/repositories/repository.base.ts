@@ -18,10 +18,12 @@ export abstract class RepositoryBase<TEntity extends IEntity>
 	}
 
 	async add(item: TEntity): Promise<void> {
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		await this.repository.insert({ ...(item as any) });
 	}
 
 	async update(item: TEntity): Promise<void> {
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		await this.repository.update(item.id, { ...(item as any) });
 	}
 
