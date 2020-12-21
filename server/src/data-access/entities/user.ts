@@ -9,6 +9,7 @@ import {
 	PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Comment } from './comment';
+import { IEntity } from './interfaces';
 import { LoginAttempt } from './loginAttempt';
 import { Post } from './post';
 import { Role } from './role';
@@ -18,7 +19,7 @@ import { SmsToken } from './smsToken';
  * Model for the user entity
  */
 @Entity()
-export class User {
+export class User implements IEntity {
 	@Index({ unique: true })
 	@PrimaryGeneratedColumn('uuid')
 	id: string;

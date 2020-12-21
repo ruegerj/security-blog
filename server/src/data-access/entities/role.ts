@@ -5,13 +5,14 @@ import {
 	ManyToMany,
 	PrimaryGeneratedColumn,
 } from 'typeorm';
+import { IEntity } from './interfaces';
 import { User } from './user';
 
 /**
  * Model for the role entity
  */
 @Entity()
-export class Role {
+export class Role implements IEntity {
 	@Index({ unique: true })
 	@PrimaryGeneratedColumn('uuid')
 	id: string;

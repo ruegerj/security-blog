@@ -8,13 +8,14 @@ import {
 	PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Comment } from './comment';
+import { IEntity } from './interfaces';
 import { User } from './user';
 
 /**
  * Model for the post entity
  */
 @Entity()
-export class Post {
+export class Post implements IEntity {
 	@Index({ unique: true })
 	@PrimaryGeneratedColumn('uuid')
 	id: string;

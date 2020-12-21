@@ -5,13 +5,14 @@ import {
 	ManyToOne,
 	PrimaryGeneratedColumn,
 } from 'typeorm';
+import { IEntity } from './interfaces';
 import { User } from './user';
 
 /**
  * Model for the login attempt entity
  */
 @Entity()
-export class LoginAttempt {
+export class LoginAttempt implements IEntity {
 	@Index({ unique: true })
 	@PrimaryGeneratedColumn('uuid')
 	id: string;

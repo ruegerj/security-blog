@@ -6,11 +6,12 @@ import {
 	ManyToOne,
 	PrimaryGeneratedColumn,
 } from 'typeorm';
+import { IEntity } from './interfaces';
 import { Post } from './post';
 import { User } from './user';
 
 @Entity()
-export class Comment {
+export class Comment implements IEntity {
 	@Index({ unique: true })
 	@PrimaryGeneratedColumn('uuid')
 	id: string;

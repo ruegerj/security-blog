@@ -5,13 +5,14 @@ import {
 	ManyToOne,
 	PrimaryGeneratedColumn,
 } from 'typeorm';
+import { IEntity } from './interfaces';
 import { User } from './user';
 
 /**
  * Entity representation of a sms token which can be issued to an user
  */
 @Entity()
-export class SmsToken {
+export class SmsToken implements IEntity {
 	@Index({ unique: true })
 	@PrimaryGeneratedColumn('uuid')
 	id: string;
