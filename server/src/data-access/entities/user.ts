@@ -45,6 +45,12 @@ export class User implements IEntity {
 	password: string;
 
 	/**
+	 * Current version of the refresh token (indicating the number of login/logout operations performed)
+	 */
+	@Column('integer')
+	tokenVersion: number;
+
+	/**
 	 * Collection of all posts written by this user
 	 */
 	@OneToMany((type) => Post, (post) => post.author)
