@@ -9,7 +9,7 @@ const xss = require('xss-clean'); // use "require" because the lack of type defi
 import hpp from 'hpp';
 import Container from 'typedi';
 import { FailResponse } from '@infrastructure/responses';
-import { loadHandler } from '@infrastructure/middleware';
+import { errorHandler, loadHandler } from '@infrastructure/middleware';
 import { IConfig } from '@infrastructure/config/interfaces';
 import { IConfigResolver } from '@infrastructure/config';
 import { Tokens } from '@infrastructure/ioc';
@@ -55,6 +55,7 @@ export class App {
 
 		this.addMiddleware();
 		this.registerControllers();
+		this.registerErrorHandler();
 
 		this.configured = true;
 	}
@@ -157,5 +158,12 @@ export class App {
 		for (const controller of controllers) {
 			this.app.use(controller.basePath, controller.router);
 		}
+	}
+
+	/**
+	 * Register the custom error handling middleware to the express stack
+	 */
+	private registerErrorHandler() {
+		this.app.use(errorHandler(this.config, this.logger));
 	}
 }
