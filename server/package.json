@@ -13,8 +13,8 @@
 		"post:compile": "ef-tspm",
 		"build": "npm run compile && npm run post:compile && npm run copy-files",
 		"rebuild": "npm run clean && npm run build",
-		"start": "node -r dotenv-with-expand/config . dotenv_config_path=./dist/config.dev.env",
-		"start:dev": "nodemon"
+		"start:dev": "node -r dotenv-with-expand/config . dotenv_config_path=./dist/config.dev.env",
+		"dev": "nodemon"
 	},
 	"repository": {
 		"type": "git",

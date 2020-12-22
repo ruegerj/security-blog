@@ -13,7 +13,8 @@ module.exports = {
 	migrationsTableName: process.env.TYPEORM_MIGRATIONS_TABLE_NAME,
 	entities: ['src/data-access/entities/*ts'], // Use explictit ts entities
 	cli: {
-		migrationsDir: process.env.TYPEORM_MIGRATIONS_DIR,
-		entitiesDir: process.env.TYPEORM_ENTITIES_DIR,
+		// Use explicit ts folders
+		migrationsDir: ['src/data-access/migrations'],
+		entitiesDir: ['src/data-access/entities'],
 	},
 };

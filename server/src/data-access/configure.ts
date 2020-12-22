@@ -13,7 +13,7 @@ export async function configure(): Promise<void> {
 
 	const connection = await createConnection();
 
-	logger.info('Connected to database', connection.name);
+	logger.info('Connected to database', connection.options.database);
 
 	Container.import([UnitOfWorkFactory]);
 }
