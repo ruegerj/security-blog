@@ -1,4 +1,3 @@
-import getAppDataPath from 'appdata-path';
 import { cleanEnv, num, str } from 'envalid';
 import { Config } from '../config';
 import { HostEnvironment } from '../hostEnvironment';

@@ -9,9 +9,9 @@ module.exports = {
 	database: process.env.TYPEORM_DATABASE,
 	logging: process.env.TYPEORM_LOGGING,
 	synchronize: process.env.TYPEORM_SYNCHRONIZE,
-	migrations: [process.env.TYPEORM_MIGRATIONS],
+	migrations: ['src/data-access/migrations/*ts'], // Use explictit ts migrations
 	migrationsTableName: process.env.TYPEORM_MIGRATIONS_TABLE_NAME,
-	entities: [process.env.TYPEORM_ENTITIES],
+	entities: ['src/data-access/entities/*ts'], // Use explictit ts entities
 	cli: {
 		migrationsDir: process.env.TYPEORM_MIGRATIONS_DIR,
 		entitiesDir: process.env.TYPEORM_ENTITIES_DIR,

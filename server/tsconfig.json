@@ -2,7 +2,7 @@
 	"compilerOptions": {
 		"module": "commonjs",
 		"esModuleInterop": true,
-		"target": "es6",
+		"target": "ES6",
 		"lib": ["ES6"],
 		"types": ["reflect-metadata"],
 		"noImplicitAny": true,
@@ -17,8 +17,9 @@
 			"@infrastructure/*": ["src/infrastructure/*"],
 			"@domain/*": ["src/domain/*"],
 			"@data-access/*": ["src/data-access/*"],
-			"*": ["node_modules/*", "src/types/*"]
+			"*": ["node_modules/*"]
 		}
 	},
-	"include": ["src/types/*.d.ts", "src/**/*"],
+	"include": ["src/**/*"],
+	"exclude": ["node_modules/*"]
 }

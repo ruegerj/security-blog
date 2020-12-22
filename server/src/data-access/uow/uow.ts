@@ -100,10 +100,12 @@ export class UnitOfWork implements IUnitOfWork {
 
 		try {
 			await this.queryRunner.commitTransaction();
-		} catch (commitError) {
+
+			this.logger.info('Transaction commited successfuly');
+		} catch (error) {
 			this.logger.error(
 				'Commit for uow failed, attempting rollback',
-				commitError,
+				error,
 			);
 
 			await this.rollback();
@@ -117,7 +119,11 @@ export class UnitOfWork implements IUnitOfWork {
 	 */
 	async rollback(): Promise<void> {
 		try {
+			this.logger.info('Attempting rollback of transaction');
+
 			await this.queryRunner.rollbackTransaction();
+
+			this.logger.info('Rollback was executed successfuly');
 		} catch (error) {
 			// Catch other errors like lost db connection etc.
 			this.logger.error('Rollback of commit failed', error);
@@ -135,6 +141,8 @@ export class UnitOfWork implements IUnitOfWork {
 		}
 
 		this.disposed = true;
+
+		this.logger.debug('Disposing uow instance...');
 
 		return this.queryRunner.release();
 	}

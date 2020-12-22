@@ -1,10 +1,6 @@
-import Container from 'typedi';
-
-import { App } from './app';
+import { Server } from 'http';
 import { NodeConfigResolver } from '@infrastructure/config';
-import { Tokens } from '@infrastructure/ioc';
-import { WinstonLogger } from '@infrastructure/logger/winstonLogger';
-import * as dataAccess from '@data-access/configure';
+import { App } from './app';
 
 // Global handler for uncaught exceptions
 process.on('uncaughtException', (err) => {
@@ -14,26 +10,17 @@ process.on('uncaughtException', (err) => {
 	process.exit(1);
 });
 
-// Register config in ioc
 const configResolver = new NodeConfigResolver();
-const config = configResolver.resolve(process.env);
 
-Container.set({
-	id: Tokens.IConfig,
-	value: config,
+let server: Server;
+
+// Create and bootstrap application
+const app = new App(configResolver);
+
+app.configure().then(() => {
+	// Start server
+	server = app.listen();
 });
-
-// Import depedencies of "App" in order to ensure that they're getting registered
-Container.import([WinstonLogger]);
-
-/**
- * Configure data access dependencies
- */
-dataAccess.configure();
-
-// Setup & start app
-const app = Container.get(App);
-const server = app.listen();
 
 // Global handler for promise rejections
 process.on('unhandledRejection', (err) => {
@@ -41,5 +28,5 @@ process.on('unhandledRejection', (err) => {
 	console.error('Shutting down app...');
 
 	// Shut down server before exiting process
-	server.close(() => process.exit(1));
+	server?.close(() => process.exit(1));
 });

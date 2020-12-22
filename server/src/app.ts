@@ -4,41 +4,34 @@ import express from 'express';
 import morgan from 'morgan';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
-import xss from 'xss-clean';
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const xss = require('xss-clean'); // use "require" because the lack of type definitions
 import hpp from 'hpp';
-import { ControllerBase } from './controllers/';
-import { IConfig } from './infrastructure/config/interfaces';
-import { FailResponse } from './infrastructure/responses';
-import { Inject, InjectMany, Service } from 'typedi';
-import { Tokens } from './infrastructure/ioc';
-import { ILogger } from './infrastructure/logger/interfaces';
-import { loadHandler } from './infrastructure/middleware';
+import Container from 'typedi';
+import { FailResponse } from '@infrastructure/responses';
+import { loadHandler } from '@infrastructure/middleware';
+import { IConfig } from '@infrastructure/config/interfaces';
+import { IConfigResolver } from '@infrastructure/config';
+import { Tokens } from '@infrastructure/ioc';
+import { WinstonLogger } from '@infrastructure/logger/winstonLogger';
+import * as dataAccess from '@data-access/configure';
+import { ILogger } from '@infrastructure/logger/interfaces';
 
-@Service()
 export class App {
 	private readonly app: express.Application;
+	private config: IConfig;
+	private logger: ILogger;
+	private configured: boolean;
 
-	constructor(
-		@InjectMany(Tokens.ControllerBase)
-		controllers: ControllerBase[],
-		@Inject(Tokens.IConfig)
-		private readonly config: IConfig,
-		@Inject(Tokens.ILogger)
-		private readonly logger: ILogger,
-	) {
-		this.config = config;
-
+	constructor(private resolver: IConfigResolver<NodeJS.ProcessEnv>) {
 		this.app = express();
-
-		this.initializeMiddleware();
-		this.initializeControllers(controllers);
 	}
 
 	/**
 	 * Intializes and starts a http server
 	 * @returns Http server instance
 	 */
-	public listen(): Server {
+	listen(): Server {
 		return this.app.listen(
 			this.config.server.port,
 			this.config.server.hostname,
@@ -51,9 +44,49 @@ export class App {
 	}
 
 	/**
+	 * Configures the application and its components
+	 */
+	async configure(): Promise<void> {
+		if (this.configured) {
+			throw new Error('Application has already been configured');
+		}
+
+		await this.configureServices();
+
+		this.addMiddleware();
+		this.registerControllers();
+
+		this.configured = true;
+	}
+
+	/**
+	 * Sets up the IoC container and registers all used services
+	 */
+	private async configureServices(): Promise<void> {
+		// Resolve and register config
+		this.config = this.resolver.resolve(process.env);
+
+		Container.set({
+			id: Tokens.IConfig,
+			value: this.config,
+		});
+
+		// Resolve and register logger instance
+		Container.import([WinstonLogger]);
+
+		this.logger = Container.get(Tokens.ILogger);
+
+		// Register all data dependencies & services from the data access
+		await dataAccess.configure();
+
+		// Register all controller used by the application
+		Container.import([]);
+	}
+
+	/**
 	 * Adds the middlware components to the express stack
 	 */
-	private initializeMiddleware() {
+	private addMiddleware() {
 		// Add request logger
 		const morganFormat = this.config.env.isDevelopment ? 'dev' : 'combined';
 		this.app.use(morgan(morganFormat, { stream: this.logger.stream() }));
@@ -116,10 +149,11 @@ export class App {
 	}
 
 	/**
-	 * Registers the routers of the provided controllers in the express stack
-	 * @param controllers Controllers which should be registered
+	 * Registers the routers of the provided controllers in the express stack, Must be called after `connfigureServices()`
 	 */
-	private initializeControllers(controllers: ControllerBase[]) {
+	private registerControllers() {
+		const controllers = Container.getMany(Tokens.ControllerBase);
+
 		for (const controller of controllers) {
 			this.app.use(controller.basePath, controller.router);
 		}
