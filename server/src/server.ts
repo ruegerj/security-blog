@@ -1,10 +1,10 @@
 import Container from 'typedi';
-import 'module-alias/register'; // Setup path aliases
 
 import { App } from './app';
-import { NodeConfigResolver } from './infrastructure/config';
-import { Tokens } from './infrastructure/ioc';
-import { WinstonLogger } from './infrastructure/logger/winstonLogger';
+import { NodeConfigResolver } from '@infrastructure/config';
+import { Tokens } from '@infrastructure/ioc';
+import { WinstonLogger } from '@infrastructure/logger/winstonLogger';
+import * as dataAccess from '@data-access/configure';
 
 // Global handler for uncaught exceptions
 process.on('uncaughtException', (err) => {
@@ -25,6 +25,11 @@ Container.set({
 
 // Import depedencies of "App" in order to ensure that they're getting registered
 Container.import([WinstonLogger]);
+
+/**
+ * Configure data access dependencies
+ */
+dataAccess.configure();
 
 // Setup & start app
 const app = Container.get(App);
