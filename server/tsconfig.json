@@ -17,8 +17,7 @@
 			"@infrastructure/*": ["src/infrastructure/*"],
 			"@domain/*": ["src/domain/*"],
 			"@data-access/*": ["src/data-access/*"],
-			"*": ["node_modules/*"],
-			"xss-clean": ["src/types/index.d.ts"]
+			"*": ["node_modules/*", "src/types/*"]
 		}
 	},
 	"include": ["src/types/*.d.ts", "src/**/*"],

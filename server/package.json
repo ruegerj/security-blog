@@ -9,16 +9,12 @@
 		"copy-files": "copyfiles -E -f ./*.env ./dist/",
 		"lint": "eslint \"src/**/*.ts\" --quiet --fix",
 		"clean": "rimraf ./dist/*",
-		"build": "tsc && npm run copy-files",
+		"compile": "tsc",
+		"post:compile": "ef-tspm",
+		"build": "npm run compile && npm run post:compile && npm run copy-files",
 		"rebuild": "npm run clean && npm run build",
 		"start": "node -r dotenv-with-expand/config . dotenv_config_path=./dist/config.dev.env",
 		"start:dev": "nodemon"
-	},
-	"_moduleAliases": {
-		"@controllers/*": "dist/controllers/*",
-		"@infrastructure/*": "dist/infrastructure/*",
-		"@domain/*": "dist/domain/*",
-		"@data-access/*": "dist/data-access/*"
 	},
 	"repository": {
 		"type": "git",
@@ -41,6 +37,7 @@
 		]
 	},
 	"devDependencies": {
+		"@ef-carbon/tspm": "^2.2.5",
 		"@types/express": "^4.17.9",
 		"@types/express-rate-limit": "^5.1.0",
 		"@types/hpp": "^0.2.1",
@@ -73,7 +70,6 @@
 		"express-rate-limit": "^5.2.3",
 		"helmet": "^4.2.0",
 		"hpp": "^0.2.3",
-		"module-alias": "^2.2.2",
 		"morgan": "^1.10.0",
 		"reflect-metadata": "^0.1.13",
 		"sqlite3": "^5.0.0",
