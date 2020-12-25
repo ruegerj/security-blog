@@ -24,9 +24,8 @@ export class AuthenticationService implements IAuthenticationService {
 	/**
 	 * Signs up a new user according to the provided data
 	 * @param model Dto containing the nescessary data for creating a new user
-	 * @returns Id of the created user
 	 */
-	async signUp(model: SignUpDto): Promise<string> {
+	async signUp(model: SignUpDto): Promise<void> {
 		const signUpUser = this.uowFactory.create();
 
 		await signUpUser.begin();
@@ -75,8 +74,6 @@ export class AuthenticationService implements IAuthenticationService {
 
 		await signUpUser.commit();
 
-		this.logger.info(`Created user "${user.email}"`);
-
-		return user.id;
+		this.logger.info(`Created account for user "${user.email}"`);
 	}
 }

@@ -27,13 +27,9 @@ export class AuthenticationController extends ControllerBase {
 	async signUp(req: Request, res: Response): Promise<void> {
 		const signUpDto = req.body as SignUpDto;
 
-		const userId = await this.authenticationService.signUp(signUpDto);
+		await this.authenticationService.signUp(signUpDto);
 
-		res.status(201).json(
-			new SuccessResponse(undefined, {
-				id: userId,
-			}),
-		);
+		res.status(201).json(new SuccessResponse());
 	}
 
 	protected initializeRoutes(): void {

@@ -98,7 +98,7 @@ export class App {
 		this.app.use(morgan(morganFormat, { stream: this.logger.stream() }));
 
 		// Apply rate limiting for api endpoints
-		const rateLimitFail = new FailResponse(
+		const rateLimitFail = new FailResponse().withMessage(
 			`There were too many request from your IP, please try again in ${
 				this.config.app.requestLimitWindow / 1000 / 60
 			} minutes`,

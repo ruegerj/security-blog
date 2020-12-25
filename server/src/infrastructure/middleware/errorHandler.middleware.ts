@@ -34,7 +34,7 @@ export function errorHandler(
 		const statusCode = error.status || 500;
 
 		let responseMessage = 'Somethin went wrong...';
-		let payload = null;
+		let payload = undefined;
 
 		// Only show detailed error in response when in development env
 		if (config.env.isDevelopment) {
@@ -47,10 +47,10 @@ export function errorHandler(
 
 		// Fail response when code = `4XX` else Error response when code = `5XX`
 		const responseObj =
-			statusCode < 500
-				? new FailResponse(responseMessage, payload)
-				: new ErrorResponse(responseMessage, payload);
+			statusCode < 500 ? new FailResponse() : new ErrorResponse();
 
-		res.status(statusCode).json(responseObj);
+		res.status(statusCode).json(
+			responseObj.withMessage(responseMessage).withPayload(payload),
+		);
 	};
 }
