@@ -15,7 +15,9 @@ import { IConfigResolver } from '@infrastructure/config';
 import { Tokens } from '@infrastructure/ioc';
 import { WinstonLogger } from '@infrastructure/logger/winstonLogger';
 import * as dataAccess from '@data-access/configure';
+import * as domain from '@domain/configure';
 import { ILogger } from '@infrastructure/logger/interfaces';
+import { AuthenticationController } from './controllers';
 
 export class App {
 	private readonly app: express.Application;
@@ -80,8 +82,11 @@ export class App {
 		// Register all data dependencies & services from the data access
 		await dataAccess.configure();
 
+		// Register all data dependencies & services from the domain
+		await domain.configure();
+
 		// Register all controller used by the application
-		Container.import([]);
+		Container.import([AuthenticationController]);
 	}
 
 	/**
