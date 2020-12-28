@@ -29,4 +29,16 @@ export class UserRepository
 
 		return foundUser !== undefined;
 	}
+
+	/**
+	 * Returns the user with the corresponding email
+	 * @param email Email for which the user should be found for
+	 * @returns Found user or null
+	 */
+	getByEmail(email: string): Promise<User> {
+		return this.repository.findOne({
+			relations: ['role'],
+			where: { email },
+		});
+	}
 }

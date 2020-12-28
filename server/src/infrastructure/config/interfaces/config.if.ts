@@ -1,4 +1,5 @@
 import { IAppConfig, IHostEnvironment, IServerConfig } from '.';
+import { IJwtConfig } from './jwt.config.if';
 
 /**
  * Interface for the global configuration options
@@ -6,5 +7,6 @@ import { IAppConfig, IHostEnvironment, IServerConfig } from '.';
 export interface IConfig {
 	env: IHostEnvironment;
 	app: IAppConfig;
+	jwt: IJwtConfig;
 	server: IServerConfig;
 }

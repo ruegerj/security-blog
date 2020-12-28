@@ -16,6 +16,7 @@ export function errorHandler(
 		error: HttpError,
 		req: Request,
 		res: Response,
+		// eslint-disable-next-line @typescript-eslint/no-unused-vars
 		next: NextFunction,
 	) => {
 		// Convert error to an obj which is serializable

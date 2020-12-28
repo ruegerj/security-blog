@@ -17,14 +17,10 @@ export abstract class ControllerBase {
 	 */
 	abstract readonly basePath: string;
 
-	constructor() {
-		this.initializeRoutes();
-	}
-
 	/**
 	 * Implementation should hook up all routes with the corresponding handler using the local router
 	 */
-	protected abstract initializeRoutes(): void;
+	abstract initializeRoutes(): void;
 
 	/**
 	 * Wraps the provided handler in a new function which catches and delegate all caught async errors to the global error handler

@@ -6,6 +6,8 @@ import { IUnitOfWorkFactory } from '@data-access/uow/factory/interfaces';
 import {
 	IAuthenticationService,
 	IHashingService,
+	ILoginAttemptService,
+	ITokenService,
 } from '@domain/services/interfaces';
 
 /**
@@ -18,7 +20,9 @@ export const Tokens = {
 	ControllerBase: new Token<ControllerBase>(),
 	// Domain
 	IAuthenticationService: new Token<IAuthenticationService>(),
+	ILoginAttemptService: new Token<ILoginAttemptService>(),
 	IHashingService: new Token<IHashingService>(),
+	ITokenService: new Token<ITokenService>(),
 	// Data access
 	IUnitOfWorkFactory: new Token<IUnitOfWorkFactory>(),
 };

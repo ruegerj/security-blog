@@ -161,6 +161,7 @@ export class App {
 		const controllers = Container.getMany(Tokens.ControllerBase);
 
 		for (const controller of controllers) {
+			controller.initializeRoutes();
 			this.app.use(controller.basePath, controller.router);
 		}
 	}

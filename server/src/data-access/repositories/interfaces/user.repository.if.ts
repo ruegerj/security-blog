@@ -18,4 +18,11 @@ export interface IUserRepository extends IRepository<User> {
 	 * @returns Boolean if the phone number exists
 	 */
 	phoneExists(phone: string): Promise<boolean>;
+
+	/**
+	 * Should return the user with the corresponding email
+	 * @param email Email for which the user should be found for
+	 * @returns Found user or null
+	 */
+	getByEmail(email: string): Promise<User>;
 }
