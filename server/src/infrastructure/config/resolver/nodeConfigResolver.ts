@@ -37,6 +37,18 @@ export class NodeConfigResolver implements IConfigResolver<NodeJS.ProcessEnv> {
 					expiresIn: environment.JWT_CHALLENGE_TOKEN_EXPIRES_IN,
 				},
 			},
+			challenge: {
+				smsCodeLength: parseInt(
+					environment.CHALLENGE_SMS_CODE_LENGTH,
+					10,
+				),
+				smsApiToken: environment.CHALLENGE_SMS_API_TOKEN,
+				smsApiBaseUrl: environment.CHALLENGE_SMS_API_BASEURL,
+				smsTokenValidFor: parseInt(
+					environment.CHALLENGE_SMS_VALID_FOR_SECONDS,
+					10,
+				),
+			},
 			server: {
 				port: parseInt(environment.SERVER_PORT, 10),
 				hostname: environment.SERVER_HOST,
@@ -65,6 +77,11 @@ export class NodeConfigResolver implements IConfigResolver<NodeJS.ProcessEnv> {
 			JWT_REFRESH_TOKEN_EXPIRES_IN: str(),
 			JWT_CHALLENGE_TOKEN_KEY: str(),
 			JWT_CHALLENGE_TOKEN_EXPIRES_IN: str(),
+			// Challenge
+			CHALLENGE_SMS_CODE_LENGTH: num(),
+			CHALLENGE_SMS_API_TOKEN: str(),
+			CHALLENGE_SMS_API_BASEURL: str(),
+			CHALLENGE_SMS_VALID_FOR_SECONDS: num(),
 			// Server
 			SERVER_PORT: num(),
 			SERVER_HOST: str(),

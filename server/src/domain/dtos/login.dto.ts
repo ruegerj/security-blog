@@ -1,20 +1,25 @@
 import { IsDefined } from 'class-validator';
 import { ChallengeType } from './enums';
+import { ICredentials } from './interfaces';
 
 /**
  * DTO for logging in an user
  */
-export class LoginDto {
+export class LoginDto implements ICredentials {
 	/**
 	 * Email address of the user
 	 */
-	@IsDefined()
+	@IsDefined({
+		message: 'The email cannot be emtpy or missing',
+	})
 	email: string;
 
 	/**
 	 * Password of the user in plain text
 	 */
-	@IsDefined()
+	@IsDefined({
+		message: 'The password cannot be emtpy or missing',
+	})
 	password: string;
 
 	/**

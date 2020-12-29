@@ -1,4 +1,5 @@
 import { SignUpDto, TokenResponseDto, LoginDto } from '@domain/dtos';
+import { ICredentials } from '@domain/dtos/interfaces';
 
 /**
  * Interface for a service which handles authentication related operations
@@ -13,11 +14,10 @@ export interface IAuthenticationService {
 
 	/**
 	 * Should validate if the given credentials are valid
-	 * @param email Email which should be validated
-	 * @param password Plain text password which should be valdiated
+	 * @param credentials Email and plain password of the user
 	 * @returns Boolean if the credentials are valid
 	 */
-	validateCredentials(email: string, password: string): Promise<boolean>;
+	validateCredentials(credentials: ICredentials): Promise<boolean>;
 
 	/**
 	 * Should sign up a new user according to the provided data

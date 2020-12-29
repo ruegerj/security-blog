@@ -1,6 +1,7 @@
 import { User } from '@data-access/entities';
 import { IUnitOfWorkFactory } from '@data-access/uow/factory/interfaces';
 import { LoginDto, SignUpDto, TokenResponseDto } from '@domain/dtos';
+import { ICredentials } from '@domain/dtos/interfaces';
 import {
 	UnauthorizedError,
 	ValidationFailedError,
@@ -43,10 +44,7 @@ export class AuthenticationService implements IAuthenticationService {
 	 * @returns Dto containing both access- and refresh-token for the user
 	 */
 	async login(model: LoginDto): Promise<TokenResponseDto> {
-		const credentialsValid = this.validateCredentials(
-			model.email,
-			model.password,
-		);
+		const credentialsValid = this.validateCredentials(model);
 
 		// Credentials invalid => abort request
 		if (!credentialsValid) {
@@ -103,26 +101,26 @@ export class AuthenticationService implements IAuthenticationService {
 
 	/**
 	 * Validates if the given credentials are valid
-	 * @param email Email which should be validated
-	 * @param password Plain text password which should be valdiated
+	 * @param credentials Email and plain password of the user
 	 * @returns Boolean if the credentials are valid
 	 */
-	async validateCredentials(
-		email: string,
-		password: string,
-	): Promise<boolean> {
+	async validateCredentials(credentials: ICredentials): Promise<boolean> {
 		const validateUnit = this.uowFactory.create();
 		await validateUnit.begin();
 
 		// Get user by email, validate password
-		const user = await validateUnit.users.getByEmail(email);
+		const user = await validateUnit.users.getByEmail(credentials.email);
 
 		if (!user) {
+			await validateUnit.rollback();
+
 			return false;
 		}
 
+		// TODO: Check login attempts
+
 		const validPassword = await this.hashingService.verify(
-			password,
+			credentials.password,
 			user.password,
 		);
 

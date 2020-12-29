@@ -5,8 +5,10 @@ import { ILogger } from '../logger/interfaces';
 import { IUnitOfWorkFactory } from '@data-access/uow/factory/interfaces';
 import {
 	IAuthenticationService,
+	IChallengeService,
 	IHashingService,
 	ILoginAttemptService,
+	ISmsService,
 	ITokenService,
 } from '@domain/services/interfaces';
 
@@ -21,8 +23,10 @@ export const Tokens = {
 	// Domain
 	IAuthenticationService: new Token<IAuthenticationService>(),
 	ILoginAttemptService: new Token<ILoginAttemptService>(),
+	IChallengeService: new Token<IChallengeService>(),
 	IHashingService: new Token<IHashingService>(),
 	ITokenService: new Token<ITokenService>(),
+	ISmsService: new Token<ISmsService>(),
 	// Data access
 	IUnitOfWorkFactory: new Token<IUnitOfWorkFactory>(),
 };

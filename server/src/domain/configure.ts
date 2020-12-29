@@ -2,8 +2,10 @@ import Container from 'typedi';
 import {
 	AuthenticationService,
 	BCryptHashingService,
+	ChallengeService,
 	JwtService,
 	LoginAttemptService,
+	SmsService,
 } from './services';
 
 /**
@@ -16,5 +18,7 @@ export async function configure(): Promise<void> {
 		LoginAttemptService,
 		BCryptHashingService,
 		JwtService,
+		ChallengeService,
+		SmsService,
 	]);
 }

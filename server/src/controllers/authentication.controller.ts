@@ -1,6 +1,10 @@
-import { LoginDto, SignUpDto } from '@domain/dtos';
+import { ChallengeRequestDto, LoginDto, SignUpDto } from '@domain/dtos';
 import { ChallengeType } from '@domain/dtos/enums';
-import { IAuthenticationService } from '@domain/services/interfaces';
+import {
+	IAuthenticationService,
+	IChallengeService,
+} from '@domain/services/interfaces';
+import { BadRequestError } from '@infrastructure/errors';
 import { Tokens } from '@infrastructure/ioc';
 import { ILogger } from '@infrastructure/logger/interfaces';
 import { validate } from '@infrastructure/middleware';
@@ -19,6 +23,10 @@ export class AuthenticationController extends ControllerBase {
 	constructor(
 		@Inject(Tokens.IAuthenticationService)
 		private authenticationService: IAuthenticationService,
+
+		@Inject(Tokens.IChallengeService)
+		private challengeService: IChallengeService,
+
 		@Inject(Tokens.ILogger)
 		private logger: ILogger,
 	) {
@@ -50,6 +58,30 @@ export class AuthenticationController extends ControllerBase {
 				token: tokens.accessToken,
 			}),
 		);
+	}
+
+	/**
+	 * Endpoint for requesting a challenge
+	 */
+	async getChallenge(req: Request, res: Response): Promise<void> {
+		const model = req.body as ChallengeRequestDto;
+
+		// Handle request according to challenge type
+		switch (model.type) {
+			case ChallengeType.SMS:
+				await this.challengeService.requestSmsChallenge(model);
+
+				res.status(201).json(
+					new SuccessResponse().withMessage(
+						'SMS code has been sendt',
+					),
+				);
+
+			default:
+				throw new BadRequestError(
+					`Unsupported challenge type "${model.type}"`,
+				);
+		}
 	}
 
 	/**
@@ -131,6 +163,12 @@ export class AuthenticationController extends ControllerBase {
 			validate(LoginDto),
 			this.parseAuthorizationHeader(this.logger, ChallengeType.SMS),
 			this.catch(this.login, this),
+		);
+
+		this.router.post(
+			'/challenge/get',
+			validate(ChallengeRequestDto),
+			this.catch(this.getChallenge, this),
 		);
 
 		this.router.post(
