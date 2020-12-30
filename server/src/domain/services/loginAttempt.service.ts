@@ -24,7 +24,7 @@ export class LoginAttemptService implements ILoginAttemptService {
 	 * @param email Email with which the attempt was issued
 	 */
 	async createAttempt(successful: boolean, email?: string): Promise<void> {
-		const createAttemptUnit = this.uowFactory.create();
+		const createAttemptUnit = this.uowFactory.create(true);
 		await createAttemptUnit.begin();
 
 		const attempt = new LoginAttempt();

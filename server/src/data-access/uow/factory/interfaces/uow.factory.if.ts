@@ -6,7 +6,8 @@ import { IUnitOfWork } from '@data-access/uow/interfaces';
 export interface IUnitOfWorkFactory {
 	/**
 	 * Should create and return a new `IUnitOfWork` instance
+	 * @param transactional Specifies if the created unit of work instance should run its operations within a transaction
 	 * @returns Created UoW instance
 	 */
-	create(): IUnitOfWork;
+	create(transactional: boolean): IUnitOfWork;
 }

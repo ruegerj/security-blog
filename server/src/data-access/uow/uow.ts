@@ -42,7 +42,11 @@ export class UnitOfWork implements IUnitOfWork {
 	 */
 	private disposed: boolean;
 
-	constructor(connection: Connection, private logger: ILogger) {
+	constructor(
+		connection: Connection,
+		private transactional: boolean,
+		private logger: ILogger,
+	) {
 		this.queryRunner = connection.createQueryRunner();
 	}
 
@@ -62,7 +66,9 @@ export class UnitOfWork implements IUnitOfWork {
 			throw new Error('This unit of work has already been initialized');
 		}
 
-		await this.queryRunner.startTransaction();
+		if (this.transactional) {
+			await this.queryRunner.startTransaction();
+		}
 
 		const { manager } = this.queryRunner;
 
@@ -98,10 +104,18 @@ export class UnitOfWork implements IUnitOfWork {
 			);
 		}
 
+		// Dipose directly if not transactional unit
+		if (!this.transactional) {
+			return this.dispose();
+		}
+
+		// Attempt committing the transaction
 		try {
 			await this.queryRunner.commitTransaction();
 
 			this.logger.info('Transaction commited successfuly');
+
+			return this.dispose();
 		} catch (error) {
 			this.logger.error(
 				'Commit for uow failed, attempting rollback',
@@ -109,8 +123,6 @@ export class UnitOfWork implements IUnitOfWork {
 			);
 
 			await this.rollback();
-		} finally {
-			await this.dispose();
 		}
 	}
 
@@ -118,6 +130,11 @@ export class UnitOfWork implements IUnitOfWork {
 	 * Attempts to rollback the perfomed database operations
 	 */
 	async rollback(): Promise<void> {
+		// Dipose directly if not transactional unit
+		if (!this.transactional) {
+			return this.dispose();
+		}
+
 		try {
 			this.logger.info('Attempting rollback of transaction');
 
@@ -129,6 +146,8 @@ export class UnitOfWork implements IUnitOfWork {
 			this.logger.error('Rollback of commit failed', error);
 
 			throw error;
+		} finally {
+			await this.dispose();
 		}
 	}
 

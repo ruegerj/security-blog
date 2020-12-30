@@ -75,7 +75,7 @@ export class ChallengeService implements IChallengeService {
 		let challengeUnit: IUnitOfWork;
 
 		try {
-			challengeUnit = this.uowFactory.create();
+			challengeUnit = this.uowFactory.create(true);
 			await challengeUnit.begin();
 
 			// Create & store sms code in db

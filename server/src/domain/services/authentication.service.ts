@@ -90,7 +90,7 @@ export class AuthenticationService implements IAuthenticationService {
 			);
 		}
 
-		const loginUnit = this.uowFactory.create();
+		const loginUnit = this.uowFactory.create(true);
 		loginUnit.begin();
 
 		// Update token version of user
@@ -122,7 +122,7 @@ export class AuthenticationService implements IAuthenticationService {
 	 * @returns User if credentials valid, else null
 	 */
 	async getAuthenticatedUser(credentials: ICredentials): Promise<User> {
-		const validateUnit = this.uowFactory.create();
+		const validateUnit = this.uowFactory.create(false);
 		await validateUnit.begin();
 
 		// Get user by email, validate password
@@ -154,7 +154,7 @@ export class AuthenticationService implements IAuthenticationService {
 	 * @returns Boolean if the max attempts have been exceeded
 	 */
 	async loginAttemptsExceeded(user: User): Promise<boolean> {
-		const attemptUnit = this.uowFactory.create();
+		const attemptUnit = this.uowFactory.create(false);
 		await attemptUnit.begin();
 
 		// Calculate timestamp for time window
@@ -176,7 +176,7 @@ export class AuthenticationService implements IAuthenticationService {
 	 * @param model Dto containing the nescessary data for creating a new user
 	 */
 	async signUp(model: SignUpDto): Promise<void> {
-		const signUpUserUnit = this.uowFactory.create();
+		const signUpUserUnit = this.uowFactory.create(true);
 
 		await signUpUserUnit.begin();
 
