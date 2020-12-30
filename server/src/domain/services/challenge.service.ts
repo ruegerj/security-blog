@@ -44,27 +44,39 @@ export class ChallengeService implements IChallengeService {
 	 * @param credentials Credentials of the user who requests the challenge
 	 */
 	async requestSmsChallenge(credentials: ICredentials): Promise<void> {
-		const credentialsValid = await this.authenticationService.validateCredentials(
+		const authenticatedUser = await this.authenticationService.getAuthenticatedUser(
 			credentials,
 		);
 
 		// Invalid credentials => abort request
-		if (!credentialsValid) {
+		if (!authenticatedUser) {
 			// Store failed attempt
 			this.loginAttemptService.createAttempt(false, credentials.email);
 
 			// Abort request as unauthorized
 			throw new UnauthorizedError('Invalid credentials');
 		}
+
+		// Check if attempts have been exceeded
+		const attempsExceeded = await this.authenticationService.loginAttemptsExceeded(
+			authenticatedUser,
+		);
+
+		if (attempsExceeded) {
+			const windowMinutes =
+				this.config.auth.loginTimeWindowMS / 1000 / 60;
+
+			// Abort request as unauthorized
+			throw new UnauthorizedError(
+				`Too many failed login requests. Try again in ${windowMinutes} minutes`,
+			);
+		}
+
 		let challengeUnit: IUnitOfWork;
 
 		try {
 			challengeUnit = this.uowFactory.create();
 			await challengeUnit.begin();
-
-			const user = await challengeUnit.users.getByEmail(
-				credentials.email,
-			);
 
 			// Create & store sms code in db
 			const challengeCode = this.createSmsCode(
@@ -75,14 +87,14 @@ export class ChallengeService implements IChallengeService {
 			token.issuedAt = new Date();
 			token.redeemed = false;
 			token.token = challengeCode;
-			token.user = user;
+			token.user = authenticatedUser;
 
 			await challengeUnit.smsTokens.add(token);
 
 			// Send actual SMS to user
 			const smsText = this.createSmsText(challengeCode);
 
-			await this.smsService.send(smsText, user.phone);
+			await this.smsService.send(smsText, authenticatedUser.phone);
 
 			// Commit changes if token could be sendt successfuly
 			await challengeUnit.commit();

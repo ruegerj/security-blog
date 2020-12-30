@@ -2,6 +2,7 @@ import { User } from '@data-access/entities';
 import { IUnitOfWorkFactory } from '@data-access/uow/factory/interfaces';
 import { LoginDto, SignUpDto, TokenResponseDto } from '@domain/dtos';
 import { ICredentials } from '@domain/dtos/interfaces';
+import { IConfig } from '@infrastructure/config/interfaces';
 import {
 	UnauthorizedError,
 	ValidationFailedError,
@@ -36,6 +37,9 @@ export class AuthenticationService implements IAuthenticationService {
 
 		@Inject(Tokens.ILogger)
 		private logger: ILogger,
+
+		@Inject(Tokens.IConfig)
+		private config: IConfig,
 	) {}
 
 	/**
@@ -44,10 +48,10 @@ export class AuthenticationService implements IAuthenticationService {
 	 * @returns Dto containing both access- and refresh-token for the user
 	 */
 	async login(model: LoginDto): Promise<TokenResponseDto> {
-		const credentialsValid = this.validateCredentials(model);
+		const authenticatedUser = await this.getAuthenticatedUser(model);
 
 		// Credentials invalid => abort request
-		if (!credentialsValid) {
+		if (!authenticatedUser) {
 			// Store failed attempt
 			this.loginAttemptService.createAttempt(false, model.email);
 
@@ -55,20 +59,13 @@ export class AuthenticationService implements IAuthenticationService {
 			throw new UnauthorizedError('Invalid credentials');
 		}
 
-		const loginUnit = this.uowFactory.create();
-		loginUnit.begin();
-
-		const user = await loginUnit.users.getByEmail(model.email);
-
 		// Validate given challenge token
 		const validatedChallengeToken = await this.tokenService.verifyChallengeToken(
 			model.token,
-			user,
+			authenticatedUser,
 		);
 
 		if (!validatedChallengeToken.valid) {
-			await loginUnit.rollback();
-
 			// Store failed attempt
 			this.loginAttemptService.createAttempt(false, model.email);
 
@@ -78,18 +75,38 @@ export class AuthenticationService implements IAuthenticationService {
 			);
 		}
 
+		// Check if attempts have been exceeded
+		const attempsExceeded = await this.loginAttemptsExceeded(
+			authenticatedUser,
+		);
+
+		if (attempsExceeded) {
+			const windowMinutes =
+				this.config.auth.loginTimeWindowMS / 1000 / 60;
+
+			// Abort request as unauthorized
+			throw new UnauthorizedError(
+				`Too many failed login requests. Try again in ${windowMinutes} minutes`,
+			);
+		}
+
+		const loginUnit = this.uowFactory.create();
+		loginUnit.begin();
+
 		// Update token version of user
-		user.tokenVersion += 1;
+		authenticatedUser.tokenVersion += 1;
 
 		// Credentials and challenge are valid => issue tokens
 		const accessToken = await this.tokenService.issueAccessToken(
-			user,
-			user.roles,
+			authenticatedUser,
+			authenticatedUser.roles,
 		);
 
-		const refreshToken = await this.tokenService.issueRefreshToken(user);
+		const refreshToken = await this.tokenService.issueRefreshToken(
+			authenticatedUser,
+		);
 
-		await loginUnit.users.update(user);
+		await loginUnit.users.update(authenticatedUser);
 
 		await loginUnit.commit();
 
@@ -100,11 +117,11 @@ export class AuthenticationService implements IAuthenticationService {
 	}
 
 	/**
-	 * Validates if the given credentials are valid
+	 * Valdiates the given credentials, if valid the corresponding user entity is returned
 	 * @param credentials Email and plain password of the user
-	 * @returns Boolean if the credentials are valid
+	 * @returns User if credentials valid, else null
 	 */
-	async validateCredentials(credentials: ICredentials): Promise<boolean> {
+	async getAuthenticatedUser(credentials: ICredentials): Promise<User> {
 		const validateUnit = this.uowFactory.create();
 		await validateUnit.begin();
 
@@ -114,10 +131,8 @@ export class AuthenticationService implements IAuthenticationService {
 		if (!user) {
 			await validateUnit.rollback();
 
-			return false;
+			return null;
 		}
-
-		// TODO: Check login attempts
 
 		const validPassword = await this.hashingService.verify(
 			credentials.password,
@@ -126,7 +141,34 @@ export class AuthenticationService implements IAuthenticationService {
 
 		await validateUnit.commit();
 
-		return validPassword;
+		if (!validPassword) {
+			return null;
+		}
+
+		return user;
+	}
+
+	/**
+	 * Checks if the max amount of failed login attempts have been exceeded by the given user
+	 * @param user User for which the login attempts shall be checked
+	 * @returns Boolean if the max attempts have been exceeded
+	 */
+	async loginAttemptsExceeded(user: User): Promise<boolean> {
+		const attemptUnit = this.uowFactory.create();
+		await attemptUnit.begin();
+
+		// Calculate timestamp for time window
+		const unix = new Date().valueOf();
+		const timelimit = new Date(unix - this.config.auth.loginTimeWindowMS);
+
+		const failedAttempts = await attemptUnit.loginAttempts.getAllFailedFromUserSince(
+			user,
+			timelimit,
+		);
+
+		await attemptUnit.commit();
+
+		return failedAttempts.length >= this.config.auth.maxFailedLoginAttempts;
 	}
 
 	/**

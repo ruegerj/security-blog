@@ -1,5 +1,6 @@
 import {
 	IAppConfig,
+	IAuthConfig,
 	IChallengeConfig,
 	IConfig,
 	IJwtConfig,
@@ -11,6 +12,7 @@ export class Config implements IConfig {
 	env: HostEnvironment;
 	app: IAppConfig;
 	jwt: IJwtConfig;
+	auth: IAuthConfig;
 	challenge: IChallengeConfig;
 	server: IServerConfig;
 }

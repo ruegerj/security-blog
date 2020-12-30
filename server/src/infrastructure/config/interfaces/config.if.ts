@@ -4,6 +4,7 @@ import {
 	IServerConfig,
 	IChallengeConfig,
 	IJwtConfig,
+	IAuthConfig,
 } from '.';
 
 /**
@@ -13,6 +14,7 @@ export interface IConfig {
 	env: IHostEnvironment;
 	app: IAppConfig;
 	jwt: IJwtConfig;
+	auth: IAuthConfig;
 	challenge: IChallengeConfig;
 	server: IServerConfig;
 }

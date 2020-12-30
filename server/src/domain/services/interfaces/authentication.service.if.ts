@@ -1,3 +1,4 @@
+import { User } from '@data-access/entities';
 import { SignUpDto, TokenResponseDto, LoginDto } from '@domain/dtos';
 import { ICredentials } from '@domain/dtos/interfaces';
 
@@ -13,11 +14,18 @@ export interface IAuthenticationService {
 	login(model: LoginDto): Promise<TokenResponseDto>;
 
 	/**
-	 * Should validate if the given credentials are valid
+	 * Should validate the given credentials, if valid the corresponding user entity is returned
 	 * @param credentials Email and plain password of the user
-	 * @returns Boolean if the credentials are valid
+	 * @returns User if credentials valid, else null
 	 */
-	validateCredentials(credentials: ICredentials): Promise<boolean>;
+	getAuthenticatedUser(credentials: ICredentials): Promise<User>;
+
+	/**
+	 * Should check if the max amount of failed login attempts have been exceeded by the given user
+	 * @param user User for which the login attempts shall be checked
+	 * @returns Boolean if the max attempts have been exceeded
+	 */
+	loginAttemptsExceeded(user: User): Promise<boolean>;
 
 	/**
 	 * Should sign up a new user according to the provided data

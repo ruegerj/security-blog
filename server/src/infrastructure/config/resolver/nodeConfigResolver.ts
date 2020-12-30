@@ -37,6 +37,16 @@ export class NodeConfigResolver implements IConfigResolver<NodeJS.ProcessEnv> {
 					expiresIn: environment.JWT_CHALLENGE_TOKEN_EXPIRES_IN,
 				},
 			},
+			auth: {
+				loginTimeWindowMS: parseInt(
+					environment.AUTH_LOGIN_TIME_WINDOW_MS,
+					10,
+				),
+				maxFailedLoginAttempts: parseInt(
+					environment.AUTH_LOGIN_MAX_FAILED_ATTEMPTS,
+					10,
+				),
+			},
 			challenge: {
 				smsCodeLength: parseInt(
 					environment.CHALLENGE_SMS_CODE_LENGTH,

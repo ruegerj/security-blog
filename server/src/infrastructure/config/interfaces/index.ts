@@ -4,3 +4,4 @@ export * from './app.config.if';
 export * from './server.config.if';
 export * from './jwt.config.if';
 export * from './challenge.config.if';
+export * from './auth.config.if';
