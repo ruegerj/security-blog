@@ -3,3 +3,4 @@ export * from './validationFailed.error';
 export * from './serviceUnavailable.error';
 export * from './unauthorized.error';
 export * from './badRequest.error';
+export * from './tooManyRequests.error';

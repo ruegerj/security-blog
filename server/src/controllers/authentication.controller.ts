@@ -4,7 +4,7 @@ import {
 	IAuthenticationService,
 	IChallengeService,
 } from '@domain/services/interfaces';
-import { BadRequestError } from '@infrastructure/errors';
+import { BadRequestError, TooManyRequestsError } from '@infrastructure/errors';
 import { Tokens } from '@infrastructure/ioc';
 import { ILogger } from '@infrastructure/logger/interfaces';
 import { validate } from '@infrastructure/middleware';
@@ -95,6 +95,13 @@ export class AuthenticationController extends ControllerBase {
 		res.status(201).json(new SuccessResponse());
 	}
 
+	async test(req: Request, res: Response): Promise<void> {
+		throw new TooManyRequestsError(
+			'Too many requests on this endpoint',
+			300,
+		);
+	}
+
 	/**
 	 * Returns a middleware which demands, that an authorization header in the correct format is set, else it returns a 401 response
 	 * @param logger Logger instance which should be used by middleware
@@ -176,6 +183,8 @@ export class AuthenticationController extends ControllerBase {
 			validate(SignUpDto),
 			this.catch(this.signUp, this),
 		);
+
+		this.router.get('/test', this.catch(this.test, this));
 	}
 }
 

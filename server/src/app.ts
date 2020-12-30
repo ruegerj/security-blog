@@ -38,8 +38,16 @@ export class App {
 			this.config.server.port,
 			this.config.server.hostname,
 			() => {
+				const stage = this.config.env.isDevelopment
+					? 'DEV'
+					: this.config.env.isTesting
+					? 'TEST'
+					: this.config.env.isProduction
+					? 'PROD'
+					: this.config.env.name;
+
 				this.logger.info(
-					`Security blog server is listening on http://${this.config.server.hostname}:${this.config.server.port}`,
+					`[${stage}] Security blog server is listening on http://${this.config.server.hostname}:${this.config.server.port}`,
 				);
 			},
 		);

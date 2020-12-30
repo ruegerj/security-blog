@@ -3,7 +3,10 @@ import { IUnitOfWorkFactory } from '@data-access/uow/factory/interfaces';
 import { IUnitOfWork } from '@data-access/uow/interfaces';
 import { ICredentials } from '@domain/dtos/interfaces';
 import { IConfig } from '@infrastructure/config/interfaces';
-import { UnauthorizedError } from '@infrastructure/errors';
+import {
+	TooManyRequestsError,
+	UnauthorizedError,
+} from '@infrastructure/errors';
 import { Tokens } from '@infrastructure/ioc';
 import { ILogger } from '@infrastructure/logger/interfaces';
 import { Inject, Service } from 'typedi';
@@ -66,9 +69,14 @@ export class ChallengeService implements IChallengeService {
 			const windowMinutes =
 				this.config.auth.loginTimeWindowMS / 1000 / 60;
 
-			// Abort request as unauthorized
-			throw new UnauthorizedError(
+			this.logger.warn(
+				'Blocked challenge request due to too many failed login attempts',
+				authenticatedUser,
+			);
+
+			throw new TooManyRequestsError(
 				`Too many failed login requests. Try again in ${windowMinutes} minutes`,
+				windowMinutes * 60,
 			);
 		}
 

@@ -4,6 +4,7 @@ import { LoginDto, SignUpDto, TokenResponseDto } from '@domain/dtos';
 import { ICredentials } from '@domain/dtos/interfaces';
 import { IConfig } from '@infrastructure/config/interfaces';
 import {
+	TooManyRequestsError,
 	UnauthorizedError,
 	ValidationFailedError,
 } from '@infrastructure/errors';
@@ -84,9 +85,14 @@ export class AuthenticationService implements IAuthenticationService {
 			const windowMinutes =
 				this.config.auth.loginTimeWindowMS / 1000 / 60;
 
-			// Abort request as unauthorized
-			throw new UnauthorizedError(
+			this.logger.warn(
+				'Blocked login request due to too many failed login attempts',
+				authenticatedUser,
+			);
+
+			throw new TooManyRequestsError(
 				`Too many failed login requests. Try again in ${windowMinutes} minutes`,
+				windowMinutes * 60,
 			);
 		}
 

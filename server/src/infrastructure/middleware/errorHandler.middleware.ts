@@ -1,7 +1,7 @@
 import { ErrorRequestHandler, NextFunction, Request, Response } from 'express';
 import { IConfig } from '@infrastructure/config/interfaces';
 import { ErrorResponse, FailResponse } from '@infrastructure/responses';
-import { HttpError } from '../errors';
+import { HttpError, TooManyRequestsError } from '../errors';
 import { ILogger } from '@infrastructure/logger/interfaces';
 
 /**
@@ -28,7 +28,9 @@ export function errorHandler(
 		};
 
 		logger.error(
-			'Caught unhandled error, sending appropriate response',
+			error.isOperational === true
+				? 'Caught operational error'
+				: 'Caught unhandled error',
 			errorObj,
 		);
 
@@ -50,8 +52,25 @@ export function errorHandler(
 		const responseObj =
 			statusCode < 500 ? new FailResponse() : new ErrorResponse();
 
+		handleHttpError(error, res);
+
 		res.status(statusCode).json(
 			responseObj.withMessage(responseMessage).withPayload(payload),
 		);
 	};
+}
+
+/**
+ * Modifies the provided response obj appropriately according to the provided error
+ * @param error Error which should be handled
+ * @param res Response obj to modify
+ */
+function handleHttpError(error: HttpError, res: Response) {
+	if (!error.isOperational) {
+		return;
+	}
+
+	if (error instanceof TooManyRequestsError) {
+		res.setHeader('Retry-After', error.data.timeoutSeconds);
+	}
 }
