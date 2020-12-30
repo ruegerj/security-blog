@@ -184,7 +184,7 @@ export class AuthenticationService implements IAuthenticationService {
 		const emailExists = await signUpUserUnit.users.emailExists(model.email);
 
 		if (emailExists) {
-			signUpUserUnit.rollback(); // dispose uow
+			await signUpUserUnit.rollback();
 
 			throw new ValidationFailedError({
 				errors: {
@@ -197,7 +197,7 @@ export class AuthenticationService implements IAuthenticationService {
 		const phoneExists = await signUpUserUnit.users.phoneExists(model.phone);
 
 		if (phoneExists) {
-			signUpUserUnit.rollback(); // Dispose uow
+			await signUpUserUnit.rollback();
 
 			throw new ValidationFailedError({
 				errors: {
