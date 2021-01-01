@@ -20,13 +20,13 @@ export interface IRepository<TEntity extends IEntity> {
 	 * Implementation should add the provided item to the collection
 	 * @param item Item which should be added
 	 */
-	add(item: TEntity): Promise<void>;
+	add(item: TEntity): Promise<TEntity>;
 
 	/**
 	 * Implementation should update the provided item
 	 * @param item Item which should be updated
 	 */
-	update(item: TEntity): Promise<void>;
+	update(item: TEntity): Promise<TEntity>;
 
 	/**
 	 * Implementation should remove the provided item

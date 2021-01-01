@@ -4,7 +4,7 @@ import {
 	IAuthenticationService,
 	IChallengeService,
 } from '@domain/services/interfaces';
-import { BadRequestError, TooManyRequestsError } from '@infrastructure/errors';
+import { BadRequestError } from '@infrastructure/errors';
 import { Tokens } from '@infrastructure/ioc';
 import { ILogger } from '@infrastructure/logger/interfaces';
 import { validate } from '@infrastructure/middleware';
@@ -69,12 +69,16 @@ export class AuthenticationController extends ControllerBase {
 		// Handle request according to challenge type
 		switch (model.type) {
 			case ChallengeType.SMS:
-				await this.challengeService.requestSmsChallenge(model);
+				const challengeId = await this.challengeService.requestSmsChallenge(
+					model,
+				);
 
 				res.status(201).json(
-					new SuccessResponse().withMessage(
-						'SMS code has been sendt',
-					),
+					new SuccessResponse()
+						.withMessage('SMS code has been sendt')
+						.withPayload({
+							challengeId,
+						}),
 				);
 
 			default:
@@ -90,9 +94,13 @@ export class AuthenticationController extends ControllerBase {
 	async signUp(req: Request, res: Response): Promise<void> {
 		const signUpDto = req.body as SignUpDto;
 
-		await this.authenticationService.signUp(signUpDto);
+		const userId = await this.authenticationService.signUp(signUpDto);
 
-		res.status(201).json(new SuccessResponse());
+		res.status(201).json(
+			new SuccessResponse().withPayload({
+				id: userId,
+			}),
+		);
 	}
 
 	/**

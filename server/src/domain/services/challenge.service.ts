@@ -45,8 +45,9 @@ export class ChallengeService implements IChallengeService {
 	/**
 	 * Creates a SMS challenge for the given user (if exists and credentials are correct)
 	 * @param credentials Credentials of the user who requests the challenge
+	 * @returns Id of the issued sms token
 	 */
-	async requestSmsChallenge(credentials: ICredentials): Promise<void> {
+	async requestSmsChallenge(credentials: ICredentials): Promise<string> {
 		const authenticatedUser = await this.authenticationService.getAuthenticatedUser(
 			credentials,
 		);
@@ -71,7 +72,7 @@ export class ChallengeService implements IChallengeService {
 
 			this.logger.warn(
 				'Blocked challenge request due to too many failed login attempts',
-				authenticatedUser,
+				authenticatedUser.email,
 			);
 
 			throw new TooManyRequestsError(
@@ -97,7 +98,7 @@ export class ChallengeService implements IChallengeService {
 			token.token = challengeCode;
 			token.user = authenticatedUser;
 
-			await challengeUnit.smsTokens.add(token);
+			const addedToken = await challengeUnit.smsTokens.add(token);
 
 			// Send actual SMS to user
 			const smsText = this.createSmsText(challengeCode);
@@ -106,6 +107,8 @@ export class ChallengeService implements IChallengeService {
 
 			// Commit changes if token could be sendt successfuly
 			await challengeUnit.commit();
+
+			return addedToken.id;
 		} catch (error) {
 			this.logger.error(
 				'Encountered error while sending sms code',

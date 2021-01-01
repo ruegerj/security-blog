@@ -17,14 +17,22 @@ export abstract class RepositoryBase<TEntity extends IEntity>
 		return this.repository.findOne(id);
 	}
 
-	async add(item: TEntity): Promise<void> {
+	async add(item: TEntity): Promise<TEntity> {
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		await this.repository.insert({ ...(item as any) });
+		const result = await this.repository.insert({ ...(item as any) });
+
+		item.id = result.identifiers[0].id; // Only one entity added => take first id
+
+		return item;
 	}
 
-	async update(item: TEntity): Promise<void> {
+	async update(item: TEntity): Promise<TEntity> {
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		await this.repository.update(item.id, { ...(item as any) });
+		await this.repository.update(item.id, {
+			...(item as any),
+		});
+
+		return item;
 	}
 
 	async remove(item: TEntity): Promise<void> {

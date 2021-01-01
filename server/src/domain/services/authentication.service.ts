@@ -87,7 +87,7 @@ export class AuthenticationService implements IAuthenticationService {
 
 			this.logger.warn(
 				'Blocked login request due to too many failed login attempts',
-				authenticatedUser,
+				authenticatedUser.email,
 			);
 
 			throw new TooManyRequestsError(
@@ -180,8 +180,9 @@ export class AuthenticationService implements IAuthenticationService {
 	/**
 	 * Signs up a new user according to the provided data
 	 * @param model Dto containing the nescessary data for creating a new user
+	 * @returns Id of the created user
 	 */
-	async signUp(model: SignUpDto): Promise<void> {
+	async signUp(model: SignUpDto): Promise<string> {
 		const signUpUserUnit = this.uowFactory.create(true);
 
 		await signUpUserUnit.begin();
@@ -226,10 +227,12 @@ export class AuthenticationService implements IAuthenticationService {
 		user.phone = model.phone;
 		user.tokenVersion = -1; // user hasn't logged in yet => -1
 
-		await signUpUserUnit.users.add(user);
+		const createdUser = await signUpUserUnit.users.add(user);
 
 		await signUpUserUnit.commit();
 
 		this.logger.info(`Created account for user "${user.email}"`);
+
+		return createdUser.id;
 	}
 }
