@@ -53,6 +53,11 @@ export function errorHandler(
 		const responseObj =
 			statusCode < 500 ? new FailResponse() : new ErrorResponse();
 
+		// Handle specific errors individualy
+		if (error instanceof TooManyRequestsError) {
+			res.setHeader('Retry-After', error.data.retryAfter);
+		}
+
 		res.status(statusCode).json(
 			responseObj.withMessage(responseMessage).withPayload(payload),
 		);

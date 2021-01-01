@@ -7,7 +7,7 @@ import { HttpError } from './http.error';
 export class TooManyRequestsError extends HttpError<TooManyRequestsPayload> {
 	constructor(message: string, timeoutSeconds: number) {
 		super(HttpStatusCode.TooManyRequests, message, {
-			timeoutSeconds,
+			retryAfter: timeoutSeconds,
 		});
 	}
 }
@@ -17,7 +17,7 @@ export class TooManyRequestsError extends HttpError<TooManyRequestsPayload> {
  */
 export interface TooManyRequestsPayload {
 	/**
-	 * Number of seconds specifying the timeout length
+	 * Number of seconds after which the request count will be reset and request are permitted again
 	 */
-	timeoutSeconds: number;
+	retryAfter: number;
 }
