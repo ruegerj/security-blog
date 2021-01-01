@@ -44,33 +44,17 @@ export function errorHandler(
 			responseMessage = error.message;
 			payload = errorObj;
 		} else if (error.isOperational === true) {
-			// If operational error use error message
+			// If operational error use error message & data payload
 			responseMessage = error.message;
+			payload = error.data;
 		}
 
 		// Fail response when code = `4XX` else Error response when code = `5XX`
 		const responseObj =
 			statusCode < 500 ? new FailResponse() : new ErrorResponse();
 
-		handleHttpError(error, res);
-
 		res.status(statusCode).json(
 			responseObj.withMessage(responseMessage).withPayload(payload),
 		);
 	};
-}
-
-/**
- * Modifies the provided response obj appropriately according to the provided error
- * @param error Error which should be handled
- * @param res Response obj to modify
- */
-function handleHttpError(error: HttpError, res: Response) {
-	if (!error.isOperational) {
-		return;
-	}
-
-	if (error instanceof TooManyRequestsError) {
-		res.setHeader('Retry-After', error.data.timeoutSeconds);
-	}
 }

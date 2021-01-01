@@ -3,13 +3,11 @@ import 'reflect-metadata';
 import express from 'express';
 import morgan from 'morgan';
 import helmet from 'helmet';
-import rateLimit from 'express-rate-limit';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const xss = require('xss-clean'); // use "require" because the lack of type definitions
 import hpp from 'hpp';
 import Container from 'typedi';
-import { FailResponse } from '@infrastructure/responses';
-import { errorHandler, loadHandler } from '@infrastructure/middleware';
+import { errorHandler, limit, loadHandler } from '@infrastructure/middleware';
 import { IConfig } from '@infrastructure/config/interfaces';
 import { IConfigResolver } from '@infrastructure/config';
 import { Tokens } from '@infrastructure/ioc';
@@ -106,19 +104,13 @@ export class App {
 		this.app.use(morgan(morganFormat, { stream: this.logger.stream() }));
 
 		// Apply rate limiting for api endpoints
-		const rateLimitFail = new FailResponse().withMessage(
-			`There were too many request from your IP, please try again in ${
-				this.config.app.requestLimitWindow / 1000 / 60
-			} minutes`,
+		this.app.use(
+			'/api',
+			limit(
+				this.config.app.requestLimitWindow,
+				this.config.app.requestLimitCount,
+			),
 		);
-
-		const limiter = rateLimit({
-			max: this.config.app.requestLimitCount,
-			windowMs: this.config.app.requestLimitWindow,
-			message: JSON.stringify(rateLimitFail),
-		});
-
-		this.app.use('/api', limiter);
 
 		// Add event loop monitoring and load handling
 		this.app.use(loadHandler(this.config, this.logger));
