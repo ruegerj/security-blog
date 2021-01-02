@@ -1,4 +1,4 @@
-import { IsDefined, IsEnum } from 'class-validator';
+import { IsDefined, IsEnum, IsString } from 'class-validator';
 import { ChallengeType } from './enums';
 import { ICredentials } from './interfaces';
 
@@ -12,6 +12,9 @@ export class ChallengeVerifyDto implements ICredentials {
 	@IsDefined({
 		message: 'The email cannot be emtpy or missing',
 	})
+	@IsString({
+		message: 'The email must be a string',
+	})
 	email: string;
 
 	/**
@@ -20,6 +23,9 @@ export class ChallengeVerifyDto implements ICredentials {
 	@IsDefined({
 		message: 'The password cannot be emtpy or missing',
 	})
+	@IsString({
+		message: 'The password must be a string',
+	})
 	password: string;
 
 	/**
@@ -27,6 +33,9 @@ export class ChallengeVerifyDto implements ICredentials {
 	 */
 	@IsDefined({
 		message: 'The challenge id cannot be emtpy or missing',
+	})
+	@IsString({
+		message: 'The challenge id must be a string',
 	})
 	challengeId: string;
 
@@ -48,6 +57,9 @@ export class ChallengeVerifyDto implements ICredentials {
 	 */
 	@IsDefined({
 		message: 'The challenge token cannot be emtpy or missing',
+	})
+	@IsString({
+		message: 'The token must be a string',
 	})
 	token: string;
 }
