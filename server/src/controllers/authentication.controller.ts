@@ -1,15 +1,9 @@
-import {
-	ChallengeRequestDto,
-	ChallengeVerifyDto,
-	LoginDto,
-	SignUpDto,
-} from '@domain/dtos';
+import { LoginDto, SignUpDto } from '@domain/dtos';
 import { ChallengeType } from '@domain/dtos/enums';
 import {
 	IAuthenticationService,
 	IChallengeService,
 } from '@domain/services/interfaces';
-import { BadRequestError } from '@infrastructure/errors';
 import { Tokens } from '@infrastructure/ioc';
 import { ILogger } from '@infrastructure/logger/interfaces';
 import { validate } from '@infrastructure/middleware';
@@ -28,9 +22,6 @@ export class AuthenticationController extends ControllerBase {
 	constructor(
 		@Inject(Tokens.IAuthenticationService)
 		private authenticationService: IAuthenticationService,
-
-		@Inject(Tokens.IChallengeService)
-		private challengeService: IChallengeService,
 
 		@Inject(Tokens.ILogger)
 		private logger: ILogger,
@@ -63,65 +54,6 @@ export class AuthenticationController extends ControllerBase {
 				token: tokens.accessToken,
 			}),
 		);
-	}
-
-	/**
-	 * Endpoint for requesting a challenge
-	 */
-	async getChallenge(req: Request, res: Response): Promise<void> {
-		const model = req.body as ChallengeRequestDto;
-
-		// Handle request according to challenge type
-		switch (model.type) {
-			case ChallengeType.SMS:
-				const challengeId = await this.challengeService.requestSmsChallenge(
-					model,
-				);
-
-				res.status(201).json(
-					new SuccessResponse()
-						.withMessage('SMS token has been sendt')
-						.withPayload({
-							challengeId,
-						}),
-				);
-
-				break;
-
-			default:
-				throw new BadRequestError(
-					`Unsupported challenge type "${model.type}"`,
-				);
-		}
-	}
-
-	/**
-	 * Endpoint for verifying challenge tokens
-	 */
-	async verifyChallenge(req: Request, res: Response): Promise<void> {
-		const model = req.body as ChallengeVerifyDto;
-
-		switch (model.type) {
-			case ChallengeType.SMS:
-				const challengeToken = await this.challengeService.verifySmsChallenge(
-					model,
-				);
-
-				res.status(200).json(
-					new SuccessResponse()
-						.withMessage('SMS token successfuly validated')
-						.withPayload({
-							challengeToken,
-						}),
-				);
-
-				break;
-
-			default:
-				throw new BadRequestError(
-					`Unsupported challenge type "${model.type}"`,
-				);
-		}
 	}
 
 	/**
@@ -207,18 +139,6 @@ export class AuthenticationController extends ControllerBase {
 			validate(LoginDto),
 			this.parseAuthorizationHeader(this.logger, ChallengeType.SMS),
 			this.catch(this.login, this),
-		);
-
-		this.router.post(
-			'/challenge/get',
-			validate(ChallengeRequestDto),
-			this.catch(this.getChallenge, this),
-		);
-
-		this.router.post(
-			'/challenge/verify',
-			validate(ChallengeVerifyDto),
-			this.catch(this.verifyChallenge, this),
 		);
 
 		this.router.post(
