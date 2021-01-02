@@ -60,8 +60,8 @@ export class ChallengeService implements IChallengeService {
 
 		// Invalid credentials => abort request
 		if (!authenticatedUser) {
-			// Store failed attempt
-			this.loginAttemptService.createAttempt(false, credentials.email);
+			// TODO: Store failed attempt
+			// this.loginAttemptService.createAttempt(false, credentials.email);
 
 			// Abort request as unauthorized
 			throw new UnauthorizedError('Invalid credentials');
@@ -141,8 +141,8 @@ export class ChallengeService implements IChallengeService {
 
 		// Invalid credentials => abort request
 		if (!authenticatedUser) {
-			// Store failed attempt
-			this.loginAttemptService.createAttempt(false, model.email);
+			// TODO: Store failed attempt
+			// this.loginAttemptService.createAttempt(false, model.email);
 
 			// Abort request as unauthorized
 			throw new UnauthorizedError('Invalid credentials');

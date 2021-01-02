@@ -26,12 +26,9 @@ export function errorHandler(
 			stack: error.stack,
 		};
 
-		logger.error(
-			error.isOperational === true
-				? 'Caught operational error'
-				: 'Caught unhandled error',
-			errorObj,
-		);
+		if (!error.isOperational) {
+			logger.error('Caught unhandled error', errorObj);
+		}
 
 		const statusCode = error.status || 500;
 

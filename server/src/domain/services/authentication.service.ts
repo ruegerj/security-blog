@@ -53,8 +53,8 @@ export class AuthenticationService implements IAuthenticationService {
 
 		// Credentials invalid => abort request
 		if (!authenticatedUser) {
-			// Store failed attempt
-			this.loginAttemptService.createAttempt(false, model.email);
+			// TODO: Store failed attempt
+			// this.loginAttemptService.createAttempt(false, model.email);
 
 			// Abort request as unauthorized
 			throw new UnauthorizedError('Invalid credentials');
@@ -67,8 +67,8 @@ export class AuthenticationService implements IAuthenticationService {
 		);
 
 		if (!validatedChallengeToken.valid) {
-			// Store failed attempt
-			this.loginAttemptService.createAttempt(false, model.email);
+			// TODO: Store failed attempt
+			//this.loginAttemptService.createAttempt(false, model.email);
 
 			// Abort request as unauthorized
 			throw new UnauthorizedError(
