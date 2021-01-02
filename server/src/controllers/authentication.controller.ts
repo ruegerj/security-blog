@@ -1,4 +1,9 @@
-import { ChallengeRequestDto, LoginDto, SignUpDto } from '@domain/dtos';
+import {
+	ChallengeRequestDto,
+	ChallengeVerifyDto,
+	LoginDto,
+	SignUpDto,
+} from '@domain/dtos';
 import { ChallengeType } from '@domain/dtos/enums';
 import {
 	IAuthenticationService,
@@ -75,11 +80,42 @@ export class AuthenticationController extends ControllerBase {
 
 				res.status(201).json(
 					new SuccessResponse()
-						.withMessage('SMS code has been sendt')
+						.withMessage('SMS token has been sendt')
 						.withPayload({
 							challengeId,
 						}),
 				);
+
+				break;
+
+			default:
+				throw new BadRequestError(
+					`Unsupported challenge type "${model.type}"`,
+				);
+		}
+	}
+
+	/**
+	 * Endpoint for verifying challenge tokens
+	 */
+	async verifyChallenge(req: Request, res: Response): Promise<void> {
+		const model = req.body as ChallengeVerifyDto;
+
+		switch (model.type) {
+			case ChallengeType.SMS:
+				const challengeToken = await this.challengeService.verifySmsChallenge(
+					model,
+				);
+
+				res.status(200).json(
+					new SuccessResponse()
+						.withMessage('SMS token successfuly validated')
+						.withPayload({
+							challengeToken,
+						}),
+				);
+
+				break;
 
 			default:
 				throw new BadRequestError(
@@ -177,6 +213,12 @@ export class AuthenticationController extends ControllerBase {
 			'/challenge/get',
 			validate(ChallengeRequestDto),
 			this.catch(this.getChallenge, this),
+		);
+
+		this.router.post(
+			'/challenge/verify',
+			validate(ChallengeVerifyDto),
+			this.catch(this.verifyChallenge, this),
 		);
 
 		this.router.post(

@@ -193,6 +193,11 @@ export class AuthenticationService implements IAuthenticationService {
 		if (emailExists) {
 			await signUpUserUnit.rollback();
 
+			this.logger.warn(
+				'Sign up request for an already existing email',
+				model.email,
+			);
+
 			throw new ValidationFailedError({
 				errors: {
 					email: ['The email is already in use'],
@@ -205,6 +210,11 @@ export class AuthenticationService implements IAuthenticationService {
 
 		if (phoneExists) {
 			await signUpUserUnit.rollback();
+
+			this.logger.warn(
+				'Sign up request for an already existing phone number',
+				model.phone,
+			);
 
 			throw new ValidationFailedError({
 				errors: {

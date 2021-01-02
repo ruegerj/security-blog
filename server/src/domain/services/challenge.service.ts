@@ -1,9 +1,12 @@
 import { SmsToken } from '@data-access/entities';
 import { IUnitOfWorkFactory } from '@data-access/uow/factory/interfaces';
 import { IUnitOfWork } from '@data-access/uow/interfaces';
+import { ChallengeVerifyDto } from '@domain/dtos';
+import { ChallengeType } from '@domain/dtos/enums';
 import { ICredentials } from '@domain/dtos/interfaces';
 import { IConfig } from '@infrastructure/config/interfaces';
 import {
+	BadRequestError,
 	TooManyRequestsError,
 	UnauthorizedError,
 } from '@infrastructure/errors';
@@ -15,6 +18,7 @@ import {
 	IChallengeService,
 	ILoginAttemptService,
 	ISmsService,
+	ITokenService,
 } from './interfaces';
 
 /**
@@ -32,6 +36,9 @@ export class ChallengeService implements IChallengeService {
 		@Inject(Tokens.ISmsService)
 		private smsService: ISmsService,
 
+		@Inject(Tokens.ITokenService)
+		private tokenService: ITokenService,
+
 		@Inject(Tokens.IUnitOfWorkFactory)
 		private uowFactory: IUnitOfWorkFactory,
 
@@ -41,7 +48,6 @@ export class ChallengeService implements IChallengeService {
 		@Inject(Tokens.ILogger)
 		private logger: ILogger,
 	) {}
-
 	/**
 	 * Creates a SMS challenge for the given user (if exists and credentials are correct)
 	 * @param credentials Credentials of the user who requests the challenge
@@ -112,6 +118,103 @@ export class ChallengeService implements IChallengeService {
 		} catch (error) {
 			this.logger.error(
 				'Encountered error while sending sms code',
+				error,
+			);
+
+			// Attempt rollback
+			await challengeUnit?.rollback();
+
+			// Rethrow error so request fails
+			throw error;
+		}
+	}
+
+	/**
+	 * Verifies the given sms token and the additionaly provided data (e.g. credentials)
+	 * @param model Dto containing the nescesary data for verifying the challenge token
+	 * @returns A challenge token which confirms the validity of the second factor
+	 */
+	async verifySmsChallenge(model: ChallengeVerifyDto): Promise<string> {
+		const authenticatedUser = await this.authenticationService.getAuthenticatedUser(
+			model,
+		);
+
+		// Invalid credentials => abort request
+		if (!authenticatedUser) {
+			// Store failed attempt
+			this.loginAttemptService.createAttempt(false, model.email);
+
+			// Abort request as unauthorized
+			throw new UnauthorizedError('Invalid credentials');
+		}
+
+		// Check if attempts have been exceeded
+		const attempsExceeded = await this.authenticationService.loginAttemptsExceeded(
+			authenticatedUser,
+		);
+
+		if (attempsExceeded) {
+			const windowMinutes =
+				this.config.auth.loginTimeWindowMS / 1000 / 60;
+
+			this.logger.warn(
+				'Blocked challenge verify due to too many failed login attempts',
+				authenticatedUser.email,
+			);
+
+			throw new TooManyRequestsError(
+				`Too many failed login requests. Try again in ${windowMinutes} minutes`,
+				windowMinutes * 60,
+			);
+		}
+
+		let challengeUnit: IUnitOfWork;
+
+		try {
+			challengeUnit = this.uowFactory.create(true);
+			await challengeUnit.begin();
+
+			const latestToken = await challengeUnit.smsTokens.getLastestForUser(
+				authenticatedUser,
+			);
+			const smsToken = await challengeUnit.smsTokens.getById(
+				model.challengeId,
+			);
+
+			if (!smsToken) {
+				// TODO: Register failed request
+				throw new BadRequestError('Invalid challenge id provided');
+			}
+
+			if (smsToken.id != latestToken.id) {
+				// TODO: Reqister failed request
+				throw new BadRequestError(
+					'Challenge id mismatch, provided challenge id is invalid. A new challenge token was issued in the meantime.',
+				);
+			}
+
+			// Sms token cannot be redeemed and must be equal to the stored value
+			if (smsToken.redeemed || model.token !== smsToken.token) {
+				// TODO: Register failed requst
+				throw new BadRequestError('Provided token is invalid');
+			}
+
+			// Redeem token
+			smsToken.redeemed = true;
+
+			await challengeUnit.smsTokens.update(smsToken);
+
+			const challengeToken = await this.tokenService.issueChallengeToken(
+				authenticatedUser,
+				ChallengeType.SMS,
+			);
+
+			await challengeUnit.commit();
+
+			return challengeToken;
+		} catch (error) {
+			this.logger.error(
+				'Encountered error while verifying sms token',
 				error,
 			);
 

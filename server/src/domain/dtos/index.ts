@@ -6,3 +6,4 @@ export * from './role.dto';
 export * from './validatedToken.dto';
 export * from './userDetail.dto';
 export * from './challengeRequest.dto';
+export * from './challengeVerify.dto';
