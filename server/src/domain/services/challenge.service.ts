@@ -208,13 +208,13 @@ export class ChallengeService implements IChallengeService {
 			}
 
 			// Check if token has expired
-			const expiresIn =
+			const expiryDate =
 				smsToken.issuedAt.valueOf() +
-				this.config.challenge.smsTokenValidFor * 1000;
+				this.config.challenge.smsTokenValidFor;
 
 			const now = new Date().valueOf();
 
-			if (now >= expiresIn) {
+			if (now >= expiryDate) {
 				// TODO: Reqister failed request
 				throw new BadRequestError('SMS token has expired');
 			}
@@ -251,7 +251,8 @@ export class ChallengeService implements IChallengeService {
 	 * @param code Sms code which should be included in the message
 	 */
 	private createSmsText(code: string): string {
-		const validForMinutes = this.config.challenge.smsTokenValidFor / 60;
+		const validForMinutes =
+			this.config.challenge.smsTokenValidFor / 1000 / 60;
 
 		return `Login @Security-Blog\nYour SMS token is: ${code}\nPlease note that this token is only valid for ${validForMinutes} minutes.`;
 	}

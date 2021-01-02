@@ -16,7 +16,7 @@ export class NodeConfigResolver implements IConfigResolver<NodeJS.ProcessEnv> {
 				bodySizeLimit: environment.APP_BODY_SIZE_LIMIT,
 				requestLimitCount: parseInt(environment.APP_REQUEST_LIMIT, 10),
 				requestLimitWindow: parseInt(
-					environment.APP_REQUEST_LIMIT_WINDOW,
+					environment.APP_REQUEST_LIMIT_WINDOW_MS,
 					10,
 				),
 				logfileSize: parseInt(environment.APP_LOG_SIZE, 10),
@@ -55,7 +55,7 @@ export class NodeConfigResolver implements IConfigResolver<NodeJS.ProcessEnv> {
 				smsApiToken: environment.CHALLENGE_SMS_API_TOKEN,
 				smsApiBaseUrl: environment.CHALLENGE_SMS_API_BASEURL,
 				smsTokenValidFor: parseInt(
-					environment.CHALLENGE_SMS_VALID_FOR_SECONDS,
+					environment.CHALLENGE_SMS_VALID_FOR_MS,
 					10,
 				),
 			},
@@ -76,7 +76,7 @@ export class NodeConfigResolver implements IConfigResolver<NodeJS.ProcessEnv> {
 			// App
 			APP_BODY_SIZE_LIMIT: str(),
 			APP_REQUEST_LIMIT: num(),
-			APP_REQUEST_LIMIT_WINDOW: num(),
+			APP_REQUEST_LIMIT_WINDOW_MS: num(),
 			APP_LOG_SIZE: num(),
 			APP_MAX_LAG: num(),
 			APP_DATA_DIR: str(),
@@ -91,7 +91,7 @@ export class NodeConfigResolver implements IConfigResolver<NodeJS.ProcessEnv> {
 			CHALLENGE_SMS_CODE_LENGTH: num(),
 			CHALLENGE_SMS_API_TOKEN: str(),
 			CHALLENGE_SMS_API_BASEURL: str(),
-			CHALLENGE_SMS_VALID_FOR_SECONDS: num(),
+			CHALLENGE_SMS_VALID_FOR_MS: num(),
 			// Server
 			SERVER_PORT: num(),
 			SERVER_HOST: str(),

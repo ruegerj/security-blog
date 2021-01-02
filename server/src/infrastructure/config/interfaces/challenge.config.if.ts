@@ -18,7 +18,7 @@ export interface IChallengeConfig {
 	smsApiBaseUrl: string;
 
 	/**
-	 * Number of seconds specifying how long an sms token should be valid
+	 * Number of miliseconds specifying how long an sms token should be valid
 	 */
 	smsTokenValidFor: number;
 }
