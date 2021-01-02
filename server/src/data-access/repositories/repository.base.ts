@@ -28,9 +28,7 @@ export abstract class RepositoryBase<TEntity extends IEntity>
 
 	async update(item: TEntity): Promise<TEntity> {
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		await this.repository.update(item.id, {
-			...(item as any),
-		});
+		await this.repository.save({ ...(item as any) });
 
 		return item;
 	}

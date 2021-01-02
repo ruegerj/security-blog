@@ -191,7 +191,7 @@ export class ChallengeService implements IChallengeService {
 			if (smsToken.id != latestToken.id) {
 				// TODO: Reqister failed request
 				throw new BadRequestError(
-					'Challenge expired, a new sms token was issued in the meantime.',
+					'Challenge expired, a new sms token was issued in the meantime',
 				);
 			}
 

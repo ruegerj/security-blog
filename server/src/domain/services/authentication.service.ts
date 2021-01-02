@@ -1,5 +1,6 @@
 import { User } from '@data-access/entities';
 import { IUnitOfWorkFactory } from '@data-access/uow/factory/interfaces';
+import { IUnitOfWork } from '@data-access/uow/interfaces';
 import { LoginDto, SignUpDto, TokenResponseDto } from '@domain/dtos';
 import { ICredentials } from '@domain/dtos/interfaces';
 import { IConfig } from '@infrastructure/config/interfaces';
@@ -96,30 +97,51 @@ export class AuthenticationService implements IAuthenticationService {
 			);
 		}
 
-		const loginUnit = this.uowFactory.create(true);
-		await loginUnit.begin();
+		let loginUnit: IUnitOfWork;
 
-		// Update token version of user
-		authenticatedUser.tokenVersion += 1;
+		try {
+			loginUnit = this.uowFactory.create(true);
+			await loginUnit.begin();
 
-		// Credentials and challenge are valid => issue tokens
-		const accessToken = await this.tokenService.issueAccessToken(
-			authenticatedUser,
-			authenticatedUser.roles,
-		);
+			// Update token version of user
+			authenticatedUser.tokenVersion += 1;
 
-		const refreshToken = await this.tokenService.issueRefreshToken(
-			authenticatedUser,
-		);
+			// Credentials and challenge are valid => issue tokens
+			const accessToken = await this.tokenService.issueAccessToken(
+				authenticatedUser,
+				authenticatedUser.roles,
+			);
 
-		await loginUnit.users.update(authenticatedUser);
+			const refreshToken = await this.tokenService.issueRefreshToken(
+				authenticatedUser,
+			);
 
-		await loginUnit.commit();
+			await loginUnit.users.update(authenticatedUser);
 
-		return {
-			accessToken,
-			refreshToken,
-		};
+			await loginUnit.commit();
+
+			this.logger.info(
+				`Logged in user: ${authenticatedUser.email}`,
+				authenticatedUser.id,
+				authenticatedUser.email,
+			);
+
+			return {
+				accessToken,
+				refreshToken,
+			};
+		} catch (error) {
+			this.logger.error(
+				'Encountered error while signin in user',
+				error,
+				authenticatedUser.email,
+			);
+
+			// Attempt rollback
+			await loginUnit?.rollback();
+
+			throw error;
+		}
 	}
 
 	/**

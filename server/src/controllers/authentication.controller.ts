@@ -166,7 +166,7 @@ export class AuthenticationController extends ControllerBase {
 			}
 
 			// Epxected authorization header pattern => authType="<type>" token="<token>"
-			const headerPattern = /^authType="([a-zA-Z]+)"[ ]{0,1}token="([a-zA-Z0-9.-]+)"$/;
+			const headerPattern = /^authType="([a-zA-Z]+)"[ ]{0,1}token="([a-zA-Z0-9-_.]+)"$/;
 
 			const headerMatch = authorizationHeader.match(headerPattern);
 
