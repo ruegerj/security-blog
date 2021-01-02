@@ -177,28 +177,46 @@ export class ChallengeService implements IChallengeService {
 			const latestToken = await challengeUnit.smsTokens.getLastestForUser(
 				authenticatedUser,
 			);
+
 			const smsToken = await challengeUnit.smsTokens.getById(
 				model.challengeId,
 			);
 
 			if (!smsToken) {
 				// TODO: Register failed request
-				throw new BadRequestError('Invalid challenge id provided');
+				throw new BadRequestError('Invalid challenge id');
 			}
 
+			// Check if provided token is latest token issued
 			if (smsToken.id != latestToken.id) {
 				// TODO: Reqister failed request
 				throw new BadRequestError(
-					'Challenge id mismatch, provided challenge id is invalid. A new challenge token was issued in the meantime.',
+					'Challenge expired, a new sms token was issued in the meantime.',
 				);
 			}
 
-			// TODO: validate lifetime
-
-			// Sms token cannot be redeemed and must be equal to the stored value
-			if (smsToken.redeemed || model.token !== smsToken.token) {
+			// Check if tokens match
+			if (model.token !== smsToken.token) {
 				// TODO: Register failed requst
-				throw new BadRequestError('Provided token is invalid');
+				throw new BadRequestError('Invalid sms token');
+			}
+
+			// Check if token was already redeemed
+			if (smsToken.redeemed) {
+				// TODO: Reqister failed request
+				throw new BadRequestError('SMS token was already redeemed');
+			}
+
+			// Check if token has expired
+			const expiresIn =
+				smsToken.issuedAt.valueOf() +
+				this.config.challenge.smsTokenValidFor * 1000;
+
+			const now = new Date().valueOf();
+
+			if (now >= expiresIn) {
+				// TODO: Reqister failed request
+				throw new BadRequestError('SMS token has expired');
 			}
 
 			// Redeem token

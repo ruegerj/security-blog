@@ -72,7 +72,7 @@ export class AuthenticationService implements IAuthenticationService {
 
 			// Abort request as unauthorized
 			throw new UnauthorizedError(
-				`Invalid challenge token provided, reason: ${validatedChallengeToken.reason}`,
+				`Invalid challenge token, reason: ${validatedChallengeToken.reason}`,
 			);
 		}
 
