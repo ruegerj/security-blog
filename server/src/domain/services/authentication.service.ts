@@ -97,7 +97,7 @@ export class AuthenticationService implements IAuthenticationService {
 		}
 
 		const loginUnit = this.uowFactory.create(true);
-		loginUnit.begin();
+		await loginUnit.begin();
 
 		// Update token version of user
 		authenticatedUser.tokenVersion += 1;

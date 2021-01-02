@@ -193,6 +193,8 @@ export class ChallengeService implements IChallengeService {
 				);
 			}
 
+			// TODO: validate lifetime
+
 			// Sms token cannot be redeemed and must be equal to the stored value
 			if (smsToken.redeemed || model.token !== smsToken.token) {
 				// TODO: Register failed requst

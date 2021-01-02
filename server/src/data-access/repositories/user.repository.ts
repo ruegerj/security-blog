@@ -37,7 +37,7 @@ export class UserRepository
 	 */
 	getByEmail(email: string): Promise<User> {
 		return this.repository.findOne({
-			relations: ['role'],
+			relations: ['roles'],
 			where: { email },
 		});
 	}

@@ -37,6 +37,7 @@ export class SmsService implements ISmsService {
 		};
 
 		const response = await fetch(requestUrl, {
+			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
 				'X-Api-Key': this.config.challenge.smsApiToken,
