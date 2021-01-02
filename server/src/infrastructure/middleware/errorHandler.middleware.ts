@@ -24,7 +24,6 @@ export function errorHandler(
 			name: error.name,
 			message: error.message,
 			stack: error.stack,
-			data: error.data,
 		};
 
 		logger.error(
@@ -42,7 +41,10 @@ export function errorHandler(
 		// Only show detailed error in response when in development env
 		if (config.env.isDevelopment) {
 			responseMessage = error.message;
-			payload = errorObj;
+			payload = {
+				...errorObj,
+				...error.data,
+			};
 		} else if (error.isOperational === true) {
 			// If operational error use error message & data payload
 			responseMessage = error.message;
