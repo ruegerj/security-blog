@@ -127,12 +127,12 @@ export class AuthenticationController extends ControllerBase {
 				return next(new UnauthorizedError());
 			}
 
-			// Epxected authorization header pattern => authType="<type>" token="<token>"
+			// Expected authorization header pattern => authType="<type>" token="<token>"
 			const headerPattern = /^authType="([a-zA-Z]+)"[ ]{0,1}token="([a-zA-Z0-9-_.]+)"$/;
 
 			const headerMatch = authorizationHeader.match(headerPattern);
 
-			// If header value doesn't come in expected patter => abort request
+			// If header value doesn't comes in expected pattern => abort request
 			if (!headerMatch) {
 				logger.info(
 					'Malformed authorization header received - Sending error response',
@@ -180,7 +180,7 @@ export class AuthenticationController extends ControllerBase {
 }
 
 /**
- * Interface for the `req.locals` obj after the `parseAuthorizationHeader()` middleware was ran
+ * Interface for the `res.locals` obj after the `parseAuthorizationHeader()` middleware was ran
  */
 interface IAuthFactorLocals extends Record<string, any> {
 	/**
