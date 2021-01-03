@@ -218,6 +218,33 @@ export class AuthenticationService implements IAuthenticationService {
 	}
 
 	/**
+	 * Logs the user with the given id out
+	 * @param userId Id of the user which should be logged out
+	 */
+	async logout(userId: string): Promise<void> {
+		const logoutUnit = this.uowFactory.create(true);
+		await logoutUnit.begin();
+
+		const user = await logoutUnit.users.getById(userId);
+
+		// No user with this id => something probably went wrong during access token generation
+		if (!user) {
+			throw new Error(
+				`Logout failed, regarding user with the id ${userId} couldn't be found`,
+			);
+		}
+
+		// Increase token version to revoke issued refresh tokens
+		user.tokenVersion += 1;
+
+		await logoutUnit.users.update(user);
+
+		await logoutUnit.commit();
+
+		this.logger.info(`Logged out user: ${user.email}`, user.id, user.email);
+	}
+
+	/**
 	 * Valdiates the given credentials, if valid the corresponding user entity is returned
 	 * @param credentials Email and plain password of the user
 	 * @returns User if credentials valid, else null

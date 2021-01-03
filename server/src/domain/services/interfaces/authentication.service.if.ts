@@ -21,6 +21,12 @@ export interface IAuthenticationService {
 	refreshAccessToken(refreshToken: string): Promise<string>;
 
 	/**
+	 * Should logout the user with the given id
+	 * @param userId Id of the user which should be logged out
+	 */
+	logout(userId: string): Promise<void>;
+
+	/**
 	 * Should validate the given credentials, if valid the corresponding user entity is returned
 	 * @param credentials Email and plain password of the user
 	 * @returns User if credentials valid, else null

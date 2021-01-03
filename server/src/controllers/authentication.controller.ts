@@ -1,11 +1,18 @@
 import { LoginDto, SignUpDto } from '@domain/dtos';
 import { ChallengeType } from '@domain/dtos/enums';
-import { IAuthenticationService } from '@domain/services/interfaces';
+import {
+	IAuthenticationService,
+	ITokenService,
+} from '@domain/services/interfaces';
 import { IConfig } from '@infrastructure/config/interfaces';
 import { BadRequestError, UnauthorizedError } from '@infrastructure/errors';
 import { Tokens } from '@infrastructure/ioc';
 import { ILogger } from '@infrastructure/logger/interfaces';
-import { validate } from '@infrastructure/middleware';
+import {
+	authenticate,
+	IAuthenticatedUserLocals,
+	validate,
+} from '@infrastructure/middleware';
 import { SuccessResponse } from '@infrastructure/responses';
 import { NextFunction, Request, RequestHandler, Response } from 'express';
 import { Inject, Service } from 'typedi';
@@ -26,6 +33,9 @@ export class AuthenticationController extends ControllerBase {
 	constructor(
 		@Inject(Tokens.IAuthenticationService)
 		private authenticationService: IAuthenticationService,
+
+		@Inject(Tokens.ITokenService)
+		private tokenService: ITokenService,
 
 		@Inject(Tokens.ILogger)
 		private logger: ILogger,
@@ -84,6 +94,24 @@ export class AuthenticationController extends ControllerBase {
 				token: accessToken,
 			}),
 		);
+	}
+
+	/**
+	 * Endpoint for logging out an user
+	 */
+	async logout(req: Request, res: Response): Promise<void> {
+		const { user } = res.locals as IAuthenticatedUserLocals;
+
+		// Logout user
+		await this.authenticationService.logout(user.subject);
+
+		// Delete refresh token cookie
+		res.cookie(this.refreshCookie, '', {
+			expires: new Date(),
+			path: '/api/auth/refresh',
+		});
+
+		res.status(204).send();
 	}
 
 	/**
@@ -170,6 +198,12 @@ export class AuthenticationController extends ControllerBase {
 		);
 
 		this.router.post('/refresh', this.catch(this.refresh, this));
+
+		this.router.post(
+			'/logout',
+			authenticate(this.tokenService, this.logger),
+			this.catch(this.logout, this),
+		);
 
 		this.router.post(
 			'/sign-up',
