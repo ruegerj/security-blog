@@ -31,11 +31,34 @@ export class UserRepository
 	}
 
 	/**
-	 * Returns the user with the corresponding email
+	 * Should return the user with the corresponding email
 	 * @param email Email for which the user should be found for
 	 * @returns Found user or null
 	 */
 	getByEmail(email: string): Promise<User> {
+		return this.repository.findOne({
+			where: { email },
+		});
+	}
+
+	/**
+	 * Returns the user with the provided id, including its roles
+	 * @param id Id of the requested user
+	 * @returns Found user or null
+	 */
+	getByIdWithRoles(id: string): Promise<User> {
+		return this.repository.findOne({
+			relations: ['roles'],
+			where: { id },
+		});
+	}
+
+	/**
+	 * Returns the user with the corresponding email
+	 * @param email Email for which the user should be found for
+	 * @returns Found user or null
+	 */
+	getByEmailWithRoles(email: string): Promise<User> {
 		return this.repository.findOne({
 			relations: ['roles'],
 			where: { email },

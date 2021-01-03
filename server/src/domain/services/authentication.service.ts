@@ -145,6 +145,79 @@ export class AuthenticationService implements IAuthenticationService {
 	}
 
 	/**
+	 * Issues a new access token if the given refresh token is valid
+	 * @param refreshToken Refresh token which authenticates the user and is used to issue a new access token
+	 * @returns Newly issued access token
+	 */
+	async refreshAccessToken(refreshToken: string): Promise<string> {
+		const validatedRefreshToken = await this.tokenService.verifyRefreshToken(
+			refreshToken,
+		);
+
+		// Check if refresh token is valid
+		if (!validatedRefreshToken.valid) {
+			this.logger.warn('Refresh attempt with invalid refresh token');
+
+			throw new UnauthorizedError(
+				`Invalid refresh token, reason: ${validatedRefreshToken.reason}`,
+			);
+		}
+
+		const refreshUnit = this.uowFactory.create(false);
+		await refreshUnit.begin();
+
+		const requestingUser = await refreshUnit.users.getByIdWithRoles(
+			validatedRefreshToken.payload.subject,
+		);
+
+		// Check if subject of token exists
+		if (!requestingUser) {
+			await refreshUnit.rollback();
+
+			this.logger.warn(
+				'Refresh attempt whith valid refresh token, but unknown subject',
+			);
+
+			throw new UnauthorizedError(
+				'Invalid refresh token, reason: unknown subject',
+			);
+		}
+
+		const providedTokenVersion = validatedRefreshToken.payload.version;
+
+		// Check if token versions allign
+		if (requestingUser.tokenVersion !== providedTokenVersion) {
+			await refreshUnit.rollback();
+
+			this.logger.warn(
+				`Refresh attempt with a token version mismatch for user: ${requestingUser.email}`,
+				requestingUser.id,
+				requestingUser.email,
+			);
+
+			throw new UnauthorizedError(
+				'Invalid refresh token, reason: token version mismatch',
+			);
+		}
+
+		// Everything is fine => issue new acces token for user
+		const accessToken = await this.tokenService.issueAccessToken(
+			requestingUser,
+			requestingUser.roles,
+		);
+
+		this.logger.info(
+			`Refreshed access token for user: ${requestingUser.email}`,
+			requestingUser.id,
+			requestingUser.email,
+		);
+
+		await refreshUnit.commit();
+
+		return accessToken;
+	}
+
+	/**
 	 * Valdiates the given credentials, if valid the corresponding user entity is returned
 	 * @param credentials Email and plain password of the user
 	 * @returns User if credentials valid, else null
@@ -154,7 +227,9 @@ export class AuthenticationService implements IAuthenticationService {
 		await validateUnit.begin();
 
 		// Get user by email, validate password
-		const user = await validateUnit.users.getByEmail(credentials.email);
+		const user = await validateUnit.users.getByEmailWithRoles(
+			credentials.email,
+		);
 
 		if (!user) {
 			await validateUnit.rollback();

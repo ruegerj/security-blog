@@ -65,7 +65,7 @@ export class User implements IEntity {
 	/**
 	 * Collection of all roles which are assigned to this user
 	 */
-	@ManyToMany((type) => Role, (role) => role.id, {
+	@ManyToMany((type) => Role, (role) => role.users, {
 		onDelete: 'RESTRICT',
 	})
 	@JoinTable()

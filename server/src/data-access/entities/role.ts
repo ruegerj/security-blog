@@ -26,7 +26,7 @@ export class Role implements IEntity {
 	/**
 	 * Collection of all roles which are assigned to this role
 	 */
-	@ManyToMany((type) => User, (user) => user.id, {
+	@ManyToMany((type) => User, (user) => user.roles, {
 		onDelete: 'RESTRICT',
 	})
 	users: User[];

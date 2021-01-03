@@ -1,13 +1,12 @@
 import { LoginDto, SignUpDto } from '@domain/dtos';
 import { ChallengeType } from '@domain/dtos/enums';
-import {
-	IAuthenticationService,
-	IChallengeService,
-} from '@domain/services/interfaces';
+import { IAuthenticationService } from '@domain/services/interfaces';
+import { IConfig } from '@infrastructure/config/interfaces';
+import { BadRequestError, UnauthorizedError } from '@infrastructure/errors';
 import { Tokens } from '@infrastructure/ioc';
 import { ILogger } from '@infrastructure/logger/interfaces';
 import { validate } from '@infrastructure/middleware';
-import { FailResponse, SuccessResponse } from '@infrastructure/responses';
+import { SuccessResponse } from '@infrastructure/responses';
 import { NextFunction, Request, RequestHandler, Response } from 'express';
 import { Inject, Service } from 'typedi';
 import { ControllerBase } from './controller.base';
@@ -17,6 +16,11 @@ import { ControllerBase } from './controller.base';
  */
 @Service({ id: Tokens.ControllerBase, multiple: true })
 export class AuthenticationController extends ControllerBase {
+	/**
+	 * Name of the cookie containing a refresh token
+	 */
+	private readonly refreshCookie = 'refresh';
+
 	readonly basePath = '/api/auth';
 
 	constructor(
@@ -25,6 +29,9 @@ export class AuthenticationController extends ControllerBase {
 
 		@Inject(Tokens.ILogger)
 		private logger: ILogger,
+
+		@Inject(Tokens.IConfig)
+		private config: IConfig,
 	) {
 		super();
 	}
@@ -43,15 +50,38 @@ export class AuthenticationController extends ControllerBase {
 		const tokens = await this.authenticationService.login(model);
 
 		// Set refresh token as cookie
-		res.cookie('refresh', tokens.refreshToken, {
+		res.cookie(this.refreshCookie, tokens.refreshToken, {
 			httpOnly: true,
 			sameSite: 'strict',
 			path: '/api/auth/refresh',
+			secure: !this.config.env.isDevelopment, // Set as secure cookie when not in development
 		});
 
 		res.status(200).json(
 			new SuccessResponse().withPayload({
 				token: tokens.accessToken,
+			}),
+		);
+	}
+
+	/**
+	 * Endpoint for refreshing the users access token
+	 */
+	async refresh(req: Request, res: Response): Promise<void> {
+		const refreshToken = req.cookies[this.refreshCookie];
+
+		// No refresh token present => abort as Unauthorized
+		if (!refreshToken) {
+			throw new UnauthorizedError('No refresh token present');
+		}
+
+		const accessToken = await this.authenticationService.refreshAccessToken(
+			refreshToken,
+		);
+
+		res.status(200).json(
+			new SuccessResponse().withPayload({
+				token: accessToken,
 			}),
 		);
 	}
@@ -94,7 +124,7 @@ export class AuthenticationController extends ControllerBase {
 					`authType="${defaultFactor}"`,
 				);
 
-				return res.status(401).send();
+				return next(new UnauthorizedError());
 			}
 
 			// Epxected authorization header pattern => authType="<type>" token="<token>"
@@ -108,13 +138,11 @@ export class AuthenticationController extends ControllerBase {
 					'Malformed authorization header received - Sending error response',
 				);
 
-				return res
-					.status(400)
-					.json(
-						new FailResponse().withMessage(
-							'Authorization header is malformed, expected structure: authType="<type>" token="<token>"',
-						),
-					);
+				return next(
+					new BadRequestError(
+						'Authorization header is malformed, expected structure: authType="<type>" token="<token>"',
+					),
+				);
 			}
 
 			// Extract factor data from regexp match
@@ -140,6 +168,8 @@ export class AuthenticationController extends ControllerBase {
 			this.parseAuthorizationHeader(this.logger, ChallengeType.SMS),
 			this.catch(this.login, this),
 		);
+
+		this.router.post('/refresh', this.catch(this.refresh, this));
 
 		this.router.post(
 			'/sign-up',

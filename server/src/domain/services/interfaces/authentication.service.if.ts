@@ -14,6 +14,13 @@ export interface IAuthenticationService {
 	login(model: LoginDto): Promise<TokenResponseDto>;
 
 	/**
+	 * Should issue a new access token if the given refresh token is valid
+	 * @param refreshToken Refresh token which authenticates the user and is used to issue a new access token
+	 * @returns Newly issued access token
+	 */
+	refreshAccessToken(refreshToken: string): Promise<string>;
+
+	/**
 	 * Should validate the given credentials, if valid the corresponding user entity is returned
 	 * @param credentials Email and plain password of the user
 	 * @returns User if credentials valid, else null

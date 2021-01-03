@@ -6,6 +6,7 @@ import helmet from 'helmet';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const xss = require('xss-clean'); // use "require" because the lack of type definitions
 import hpp from 'hpp';
+import cookieParser from 'cookie-parser';
 import Container from 'typedi';
 import { errorHandler, limit, loadHandler } from '@infrastructure/middleware';
 import { IConfig } from '@infrastructure/config/interfaces';
@@ -129,6 +130,9 @@ export class App {
 				limit: this.config.app.bodySizeLimit,
 			}),
 		);
+
+		// Add middleware for parsing request cookies
+		this.app.use(cookieParser());
 
 		// Set security http headers
 		// For config see: https://helmetjs.github.io/
