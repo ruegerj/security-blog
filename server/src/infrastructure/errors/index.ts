@@ -4,3 +4,4 @@ export * from './serviceUnavailable.error';
 export * from './unauthorized.error';
 export * from './badRequest.error';
 export * from './tooManyRequests.error';
+export * from './notFound.error';

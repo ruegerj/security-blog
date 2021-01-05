@@ -1,7 +1,7 @@
 import { Server } from 'http';
 import path from 'path';
 import 'reflect-metadata';
-import express, { Request, Response } from 'express';
+import express, { NextFunction, Request, Response } from 'express';
 import morgan from 'morgan';
 import helmet from 'helmet';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -19,6 +19,7 @@ import * as dataAccess from '@data-access/configure';
 import * as domain from '@domain/configure';
 import { ILogger } from '@infrastructure/logger/interfaces';
 import { AuthenticationController, ChallengeController } from './controllers';
+import { NotFoundError } from '@infrastructure/errors';
 
 export class App {
 	private readonly app: express.Application;
@@ -171,6 +172,14 @@ export class App {
 			controller.initializeRoutes();
 			this.app.use(controller.basePath, controller.router);
 		}
+
+		// Register not found handler for api
+		this.app.all(
+			'/api/*',
+			(req: Request, res: Response, next: NextFunction) => {
+				next(new NotFoundError('Path not found'));
+			},
+		);
 	}
 
 	/**
