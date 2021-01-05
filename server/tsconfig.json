@@ -10,7 +10,7 @@
 		"experimentalDecorators": true,
 		"emitDecoratorMetadata": true,
 		"sourceMap": true,
-		"outDir": "dist",
+		"outDir": "dist/server",
 		"baseUrl": ".",
 		"paths": {
 			"@controllers/*": ["src/controllers/*"],

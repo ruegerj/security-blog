@@ -31,4 +31,9 @@ export interface IAppConfig {
 	 * Path to the directory for storing data (%APPDATA/..) for this application
 	 */
 	dataLocation: string;
+
+	/**
+	 * Max age the static files / content should have before reload
+	 */
+	staticContentMaxAge: string;
 }

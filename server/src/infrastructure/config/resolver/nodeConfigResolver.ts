@@ -22,6 +22,7 @@ export class NodeConfigResolver implements IConfigResolver<NodeJS.ProcessEnv> {
 				logfileSize: parseInt(environment.APP_LOG_SIZE, 10),
 				maxLag: parseInt(environment.APP_MAX_LAG, 10),
 				dataLocation: environment.APP_DATA_DIR,
+				staticContentMaxAge: environment.APP_STATIC_CONTENT_MAX_AGE,
 			},
 			jwt: {
 				accessToken: {
@@ -80,6 +81,7 @@ export class NodeConfigResolver implements IConfigResolver<NodeJS.ProcessEnv> {
 			APP_LOG_SIZE: num(),
 			APP_MAX_LAG: num(),
 			APP_DATA_DIR: str(),
+			APP_STATIC_CONTENT_MAX_AGE: str(),
 			// JWT
 			JWT_ACCESS_TOKEN_KEY: str(),
 			JWT_ACCESS_TOKEN_EXPIRES_IN: str(),

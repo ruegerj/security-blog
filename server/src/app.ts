@@ -1,11 +1,13 @@
 import { Server } from 'http';
+import path from 'path';
 import 'reflect-metadata';
-import express from 'express';
+import express, { Request, Response } from 'express';
 import morgan from 'morgan';
 import helmet from 'helmet';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const xss = require('xss-clean'); // use "require" because the lack of type definitions
 import hpp from 'hpp';
+import compression from 'compression';
 import cookieParser from 'cookie-parser';
 import Container from 'typedi';
 import { errorHandler, limit, loadHandler } from '@infrastructure/middleware';
@@ -64,6 +66,7 @@ export class App {
 
 		this.addMiddleware();
 		this.registerControllers();
+		this.serveStaticFiles();
 		this.registerErrorHandler();
 
 		this.configured = true;
@@ -168,6 +171,36 @@ export class App {
 			controller.initializeRoutes();
 			this.app.use(controller.basePath, controller.router);
 		}
+	}
+
+	/**
+	 * Configures the application to serve the static files from the hosted SPA client (angular)
+	 */
+	private serveStaticFiles() {
+		// Use compression middlware reduce size of static files
+		this.app.use(compression());
+
+		// Determine max age uppon current stage
+		const maxAge = this.config.env.isDevelopment
+			? undefined
+			: this.config.app.staticContentMaxAge;
+
+		const staticContentLocation = path.join(__dirname, '../client');
+
+		// Configure middleware for serving static file
+		this.app.get(
+			'*.(js|css|ttf|svg|png|jpg|jpeg|ico|woff2|woff|txt|html)',
+			express.static(staticContentLocation, {
+				maxAge,
+			}),
+		);
+
+		// Configure middleware for serving the angular applicaiton paths
+		this.app.all('*', (req: Request, res: Response) => {
+			res.status(200).sendFile('/', {
+				root: staticContentLocation,
+			});
+		});
 	}
 
 	/**
