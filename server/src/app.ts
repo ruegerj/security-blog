@@ -161,7 +161,7 @@ export class App {
 					scriptSrc: ["'self'"], // Scripts shall only be loaded from own domain
 					frameAncestors: ["'none'"], // Deny frame representations on any domain
 					imgSrc: ["'self'"], // Img's shall only be loaded from own domain
-					styleSrc: ["'self'"], // Styles shall only be loaded from own domain
+					styleSrc: ["'self'", "'unsafe-inline'"], // Styles shall only be loaded from own domain (except inline styles for angular client)
 				},
 			}),
 		);

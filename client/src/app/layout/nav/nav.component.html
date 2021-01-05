@@ -1,0 +1,24 @@
+<mdb-navbar
+	SideClass="navbar navbar-expand-lg navbar-light ie-nav fixed-top"
+	[containerInside]="false"
+>
+	<mdb-navbar-brand>
+		<span class="logo navbar-brand">
+			<mdb-icon fas icon="lock"></mdb-icon>
+			Security Blog
+		</span>
+	</mdb-navbar-brand>
+	<links>
+		<ul class="navbar-nav mr-auto">
+			<li *ngFor="let item of navItems" class="nav-item">
+				<a
+					class="nav-link"
+					[routerLink]="item.link"
+					routerLinkActive="active"
+				>
+					{{ item.title }}
+				</a>
+			</li>
+		</ul>
+	</links>
+</mdb-navbar>
