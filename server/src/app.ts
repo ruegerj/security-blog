@@ -10,7 +10,12 @@ import hpp from 'hpp';
 import compression from 'compression';
 import cookieParser from 'cookie-parser';
 import Container from 'typedi';
-import { errorHandler, limit, loadHandler } from '@infrastructure/middleware';
+import {
+	errorHandler,
+	httpsRedirect,
+	limit,
+	loadHandler,
+} from '@infrastructure/middleware';
 import { IConfig } from '@infrastructure/config/interfaces';
 import { IConfigResolver } from '@infrastructure/config';
 import { Tokens } from '@infrastructure/ioc';
@@ -119,6 +124,12 @@ export class App {
 
 		// Add event loop monitoring and load handling
 		this.app.use(loadHandler(this.config, this.logger));
+
+		// Add https redirect if not in development env
+		if (!this.config.env.isDevelopment) {
+			this.app.enable('trust proxy');
+			this.app.use(httpsRedirect());
+		}
 
 		// Limit allowed body size
 		this.app.use(
