@@ -34,7 +34,7 @@ export class LoginComponent implements OnInit {
 		this.loggingIn = true;
 
 		setTimeout(() => {
-			this.router.navigate(['sms', 'verify']);
+			this.router.navigate(['challenge', 'sms']);
 		}, 5000);
 	}
 

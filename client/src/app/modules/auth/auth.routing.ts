@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { LoginComponent } from './pages/login/login.component';
-import { VerifySmsComponent } from './pages/verify-sms/verify-sms.component';
+import { SmsChallengeComponent } from './pages/sms-challenge/sms-challenge.component';
 
 const routes: Routes = [
 	{
@@ -9,8 +9,13 @@ const routes: Routes = [
 		component: LoginComponent,
 	},
 	{
-		path: 'sms/verify',
-		component: VerifySmsComponent,
+		path: 'challenge',
+		children: [
+			{
+				path: 'sms',
+				component: SmsChallengeComponent,
+			},
+		],
 	},
 	{
 		path: 'register',

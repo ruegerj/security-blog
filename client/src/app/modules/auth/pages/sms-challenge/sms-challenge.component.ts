@@ -7,11 +7,11 @@ import {
 } from '@angular/forms';
 
 @Component({
-	selector: 'app-verify-sms',
-	templateUrl: './verify-sms.component.html',
-	styleUrls: ['./verify-sms.component.scss'],
+	selector: 'app-sms-challenge',
+	templateUrl: './sms-challenge.component.html',
+	styleUrls: ['./sms-challenge.component.scss'],
 })
-export class VerifySmsComponent implements OnInit {
+export class SmsChallengeComponent implements OnInit {
 	smsVerifyForm: FormGroup;
 	sendingSms: boolean = false;
 	verifyingSms: boolean = false;
