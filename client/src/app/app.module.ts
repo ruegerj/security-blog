@@ -10,7 +10,12 @@ import { NavComponent } from './layout/nav/nav.component';
 import { AuthLayoutComponent } from './layout/auth-layout/auth-layout.component';
 
 @NgModule({
-	declarations: [AppComponent, ContentLayoutComponent, NavComponent, AuthLayoutComponent],
+	declarations: [
+		AppComponent,
+		ContentLayoutComponent,
+		NavComponent,
+		AuthLayoutComponent,
+	],
 	imports: [BrowserModule, CoreModule, SharedModule, AppRoutingModule],
 	providers: [],
 	bootstrap: [AppComponent],
