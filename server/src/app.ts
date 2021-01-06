@@ -111,7 +111,10 @@ export class App {
 	private addMiddleware() {
 		// Add request logger
 		const morganFormat = this.config.env.isDevelopment ? 'dev' : 'combined';
-		this.app.use(morgan(morganFormat, { stream: this.logger.stream() }));
+		this.app.use(
+			'api',
+			morgan(morganFormat, { stream: this.logger.stream() }),
+		);
 
 		// Apply rate limiting for api endpoints
 		this.app.use(
