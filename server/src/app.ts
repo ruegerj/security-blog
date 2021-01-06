@@ -209,7 +209,7 @@ export class App {
 
 		// Configure middleware for serving static file
 		this.app.get(
-			'*.(js|css|ttf|svg|png|jpg|jpeg|ico|woff2|woff|txt|html)',
+			'*.(js|js.map|css|css.map|ttf|svg|png|jpg|jpeg|ico|woff2|woff|txt|html)',
 			express.static(staticContentLocation, {
 				maxAge,
 			}),
