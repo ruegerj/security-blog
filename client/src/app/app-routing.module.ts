@@ -6,13 +6,20 @@ import { ContentLayoutComponent } from './layout/content-layout/content-layout.c
 const routes: Routes = [
 	{
 		path: '',
+		component: AuthLayoutComponent,
+		loadChildren: () =>
+			import('@modules/auth/auth.module').then((m) => m.AuthModule),
+	},
+	{
+		path: '',
 		component: ContentLayoutComponent,
 		children: [],
 	},
+	// Fallback for unmatched routes
 	{
-		path: 'auth',
-		component: AuthLayoutComponent,
-		children: [],
+		path: '**',
+		redirectTo: '/',
+		pathMatch: 'full',
 	},
 ];
 
