@@ -3,9 +3,10 @@ import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { MDBBootstrapModule } from 'angular-bootstrap-md';
+import { ValidationErrorsComponent } from './components/validation-errors/validation-errors.component';
 
 @NgModule({
-	declarations: [],
+	declarations: [ValidationErrorsComponent],
 	imports: [
 		CommonModule,
 		FormsModule,
@@ -19,6 +20,7 @@ import { MDBBootstrapModule } from 'angular-bootstrap-md';
 		ReactiveFormsModule,
 		RouterModule,
 		MDBBootstrapModule,
+		ValidationErrorsComponent,
 	],
 })
 export class SharedModule {}
