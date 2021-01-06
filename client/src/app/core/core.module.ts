@@ -1,12 +1,18 @@
-import { NgModule } from '@angular/core';
+import { NgModule, Optional, SkipSelf } from '@angular/core';
 import { CommonModule } from '@angular/common';
-
-
+import { throwIfAlreadyLoaded } from './guards';
 
 @NgModule({
-  declarations: [],
-  imports: [
-    CommonModule
-  ]
+	declarations: [],
+	imports: [CommonModule],
 })
-export class CoreModule { }
+export class CoreModule {
+	constructor(
+		@Optional()
+		@SkipSelf()
+		parentModule: CoreModule,
+	) {
+		// Guard module for multiple loads
+		throwIfAlreadyLoaded(parentModule, 'CoreModule');
+	}
+}
