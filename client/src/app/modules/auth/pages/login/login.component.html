@@ -1,4 +1,4 @@
-<mdb-card class="w-100">
+<mdb-card>
 	<mdb-card-body>
 		<mdb-card-title class="text-center">
 			<h6>
@@ -39,9 +39,16 @@
 					class="m-0"
 					color="primary"
 					type="submit"
-					[disabled]="!loginForm.valid"
+					[disabled]="!loginForm.valid || loggingIn"
 				>
 					Login
+					<mdb-icon
+						*ngIf="loggingIn"
+						fas
+						class="ml-1"
+						icon="spinner"
+						classInside="fa-spin"
+					></mdb-icon>
 				</button>
 
 				<span class="d-flex flex-column justify-conent-center">

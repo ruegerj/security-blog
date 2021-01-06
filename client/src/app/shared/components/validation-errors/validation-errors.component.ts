@@ -26,10 +26,18 @@ export class ValidationErrorsComponent {
 		return undefined;
 	}
 
-	private lookUpError(validatorName: string, validatorValue?: any): string {
+	private lookUpError(
+		validatorName: string,
+		validatorValue?: Record<string, unknown>,
+	): string {
 		const messageLookup: Record<string, string> = {
 			required: 'This field is required.',
-			maxLength: `This field can't contain more than ${validatorValue} characters.`,
+			minlength: `This field must contain atleast: ${
+				validatorValue?.requiredLength || 'n/a'
+			} characters`,
+			maxlength: `This field can't contain more than ${
+				validatorValue?.requiredLength || 'n/a'
+			} characters.`,
 		};
 
 		return messageLookup[validatorName] || 'Invalid field.';
