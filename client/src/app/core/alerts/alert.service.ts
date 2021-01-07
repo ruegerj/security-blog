@@ -84,6 +84,7 @@ export class AlertService {
 		this.alert(
 			new Alert({
 				...options,
+				autoClose: false,
 				message,
 				type: AlertType.Error,
 			}),

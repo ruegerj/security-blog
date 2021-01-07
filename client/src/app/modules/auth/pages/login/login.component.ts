@@ -6,6 +6,7 @@ import {
 	Validators,
 } from '@angular/forms';
 import { Router } from '@angular/router';
+import { AlertService } from '@app/alerts';
 
 @Component({
 	selector: 'app-login',
@@ -16,7 +17,13 @@ export class LoginComponent implements OnInit {
 	loginForm: FormGroup;
 	loggingIn: boolean = false;
 
-	constructor(private formBuilder: FormBuilder, private router: Router) {
+	alertId = 'login-alert';
+
+	constructor(
+		private formBuilder: FormBuilder,
+		private router: Router,
+		private alertService: AlertService,
+	) {
 		this.loginForm = this.createLoginForm();
 	}
 
@@ -34,6 +41,7 @@ export class LoginComponent implements OnInit {
 		this.loggingIn = true;
 
 		setTimeout(() => {
+			this.loggingIn = false;
 			this.router.navigate(['challenge', 'sms']);
 		}, 5000);
 	}

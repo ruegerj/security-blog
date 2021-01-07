@@ -5,6 +5,7 @@ import {
 	FormGroup,
 	Validators,
 } from '@angular/forms';
+import { AlertService } from '@app/alerts';
 
 @Component({
 	selector: 'app-sms-challenge',
@@ -15,8 +16,12 @@ export class SmsChallengeComponent implements OnInit {
 	smsVerifyForm: FormGroup;
 	sendingSms: boolean = false;
 	verifyingSms: boolean = false;
+	alertId = 'challenge-alert';
 
-	constructor(private formBuilder: FormBuilder) {
+	constructor(
+		private formBuilder: FormBuilder,
+		private alertService: AlertService,
+	) {
 		this.smsVerifyForm = this.createForm();
 	}
 
@@ -37,6 +42,9 @@ export class SmsChallengeComponent implements OnInit {
 
 		setTimeout(() => {
 			this.sendingSms = false;
+			this.alertService.success('New SMS code was sendt', {
+				id: this.alertId,
+			});
 		}, 3000);
 	}
 

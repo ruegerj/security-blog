@@ -15,7 +15,7 @@ export class AlertComponent implements OnInit, OnDestroy {
 	 * Id which specifies which alerts this component should be displaying
 	 */
 	@Input()
-	id = AlertService.globalId;
+	alertId = AlertService.globalId;
 
 	/**
 	 * Specifies if the alerts should be faded out when closed
@@ -120,7 +120,7 @@ export class AlertComponent implements OnInit, OnDestroy {
 	 * Returns a subscription for incoming alerts
 	 */
 	private subscribeForAlerts(): Subscription {
-		return this.alertService.onAlert(this.id).subscribe((alert) => {
+		return this.alertService.onAlert(this.alertId).subscribe((alert) => {
 			// Clear local alerts when signal e.g. empty alert is received
 			if (!alert.message) {
 				return this.clear();
@@ -144,7 +144,7 @@ export class AlertComponent implements OnInit, OnDestroy {
 	private subscribeForRouteChanges(): Subscription {
 		return this.router.events.subscribe((event) => {
 			if (event instanceof NavigationStart) {
-				this.alertService.clear(this.id);
+				this.alertService.clear(this.alertId);
 			}
 		});
 	}

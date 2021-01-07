@@ -12,6 +12,8 @@
 			A sms code was sent to your registered phone number.
 		</mdb-card-text>
 
+		<app-alert [alertId]="alertId" [fade]="true"></app-alert>
+
 		<form (ngSubmit)="verifySms()" [formGroup]="smsVerifyForm">
 			<div class="form-group">
 				<label for="smsCodeInput">SMS Code</label>
