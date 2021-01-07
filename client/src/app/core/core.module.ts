@@ -3,8 +3,11 @@ import { CommonModule } from '@angular/common';
 import { throwIfAlreadyLoaded } from './guards';
 import { LoggerModule, NgxLoggerLevel } from 'ngx-logger';
 import { environment } from '@env';
-import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
-import { LoggingInterceptor } from './interceptors';
+import { HttpClientModule } from '@angular/common/http';
+import {
+	ErrorInterceptorProvider,
+	LoggingInterceptorProvider,
+} from './interceptors';
 
 @NgModule({
 	declarations: [],
@@ -19,13 +22,7 @@ import { LoggingInterceptor } from './interceptors';
 			timestampFormat: 'dd/MM/yy h:mm:ss',
 		}),
 	],
-	providers: [
-		{
-			provide: HTTP_INTERCEPTORS,
-			useClass: LoggingInterceptor,
-			multi: true,
-		},
-	],
+	providers: [LoggingInterceptorProvider, ErrorInterceptorProvider],
 	exports: [],
 })
 export class CoreModule {

@@ -1,10 +1,11 @@
-import { Injectable } from '@angular/core';
+import { Injectable, Provider } from '@angular/core';
 import {
 	HttpRequest,
 	HttpHandler,
 	HttpEvent,
 	HttpInterceptor,
 	HttpErrorResponse,
+	HTTP_INTERCEPTORS,
 } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { NGXLogger } from 'ngx-logger';
@@ -40,3 +41,12 @@ export class LoggingInterceptor implements HttpInterceptor {
 		);
 	}
 }
+
+/**
+ * Provider for the logging interceptor
+ */
+export const LoggingInterceptorProvider: Provider = {
+	provide: HTTP_INTERCEPTORS,
+	useClass: LoggingInterceptor,
+	multi: true,
+};
