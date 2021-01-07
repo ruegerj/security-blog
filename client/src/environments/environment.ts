@@ -3,7 +3,11 @@
 // The list of file replacements can be found in `angular.json`.
 
 export const environment = {
-  production: false
+	production: false,
+	/**
+	 * Specifies the base path to the backend api of the current stage
+	 */
+	apiBasePath: 'http://localhost:3000/api',
 };
 
 /*
