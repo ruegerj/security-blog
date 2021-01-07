@@ -8,9 +8,8 @@ import {
 import { Router } from '@angular/router';
 import { AlertService } from '@app/alerts';
 import { AuthenticationService } from '@app/services';
-import { EMPTY, of } from 'rxjs';
+import { EMPTY } from 'rxjs';
 import { catchError, finalize, tap } from 'rxjs/operators';
-import { ChallengeType } from 'src/app/data/enums';
 import { Credentials } from 'src/app/data/models';
 
 @Component({
@@ -41,23 +40,30 @@ export class LoginComponent implements OnInit {
 			password: this.loginForm.get('password')?.value,
 		};
 
+		// Clear existing alerts
+		this.alertService.clear(this.alertId);
+
 		this.loggingIn = true;
 
+		this.authenticationService.setCredentials(credentials);
+
 		this.authenticationService
-			.requestChallenge(credentials, ChallengeType.SMS)
+			.requestSmsChallenge()
 			.pipe(
 				tap(() => {
 					this.router.navigate(['challenge', 'sms']);
-				}),
-				finalize(() => {
-					this.loggingIn = false;
 				}),
 				catchError((err) => {
 					this.alertService.error(err, {
 						id: this.alertId,
 					});
 
+					this.clearPasswordField();
+
 					return EMPTY;
+				}),
+				finalize(() => {
+					this.loggingIn = false;
 				}),
 			)
 			.subscribe();
@@ -71,6 +77,19 @@ export class LoginComponent implements OnInit {
 		}
 
 		return control;
+	}
+
+	/**
+	 * Clears the password field
+	 */
+	private clearPasswordField(): void {
+		const control = this.loginForm.get('password');
+
+		if (!control) {
+			return;
+		}
+
+		control.setValue('');
 	}
 
 	private createLoginForm(): FormGroup {

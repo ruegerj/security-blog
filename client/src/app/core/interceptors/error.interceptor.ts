@@ -40,10 +40,15 @@ export class ErrorInterceptor implements HttpInterceptor {
 						errorResponse.error,
 					);
 
-					// Try extract message from error response or take status text
-					errorMessage =
-						errorResponse.error['message'] ||
-						errorResponse.statusText;
+					// Use generic error message for sever errors
+					if (errorResponse.status >= 500) {
+						errorMessage = 'Something went wrong, try again later';
+					} else {
+						// Try extract message from error response or take status text
+						errorMessage =
+							errorResponse.error['message'] ||
+							errorResponse.statusText;
+					}
 				}
 
 				return throwError(errorMessage);
