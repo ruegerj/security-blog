@@ -53,7 +53,7 @@ export class ErrorInterceptor implements HttpInterceptor {
 }
 
 /**
- * Provider for the error interceptor
+ * Provider for the `ErrorInterceptor`
  */
 export const ErrorInterceptorProvider: Provider = {
 	provide: HTTP_INTERCEPTORS,

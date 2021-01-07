@@ -7,6 +7,7 @@ import { HttpClientModule } from '@angular/common/http';
 import {
 	ErrorInterceptorProvider,
 	LoggingInterceptorProvider,
+	ParseBodyInterceptorProvider,
 } from './interceptors';
 
 @NgModule({
@@ -22,7 +23,11 @@ import {
 			timestampFormat: 'dd/MM/yy h:mm:ss',
 		}),
 	],
-	providers: [LoggingInterceptorProvider, ErrorInterceptorProvider],
+	providers: [
+		LoggingInterceptorProvider,
+		ErrorInterceptorProvider,
+		ParseBodyInterceptorProvider,
+	],
 	exports: [],
 })
 export class CoreModule {

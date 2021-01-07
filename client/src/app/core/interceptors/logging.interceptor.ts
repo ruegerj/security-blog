@@ -43,7 +43,7 @@ export class LoggingInterceptor implements HttpInterceptor {
 }
 
 /**
- * Provider for the logging interceptor
+ * Provider for the `LoggingInterceptor`
  */
 export const LoggingInterceptorProvider: Provider = {
 	provide: HTTP_INTERCEPTORS,
