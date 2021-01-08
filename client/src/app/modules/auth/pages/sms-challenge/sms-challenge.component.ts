@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import {
-	AbstractControl,
 	FormBuilder,
+	FormControl,
 	FormGroup,
 	Validators,
 } from '@angular/forms';
@@ -48,14 +48,8 @@ export class SmsChallengeComponent implements OnInit {
 		}, 3000);
 	}
 
-	getControl(name: string): AbstractControl {
-		const control = this.smsVerifyForm.get(name);
-
-		if (!control) {
-			throw new Error(`No control found with the name: ${name}`);
-		}
-
-		return control;
+	get smsCodeControl() {
+		return this.smsVerifyForm.get('smsCode') as FormControl;
 	}
 
 	createForm(): FormGroup {

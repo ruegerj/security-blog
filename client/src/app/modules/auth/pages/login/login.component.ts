@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import {
-	AbstractControl,
 	FormBuilder,
+	FormControl,
 	FormGroup,
 	Validators,
 } from '@angular/forms';
@@ -36,8 +36,8 @@ export class LoginComponent implements OnInit {
 
 	login(): void {
 		const credentials: Credentials = {
-			email: this.loginForm.get('email')?.value,
-			password: this.loginForm.get('password')?.value,
+			email: this.emailControl?.value,
+			password: this.passwordControl?.value,
 		};
 
 		// Clear existing alerts
@@ -69,14 +69,12 @@ export class LoginComponent implements OnInit {
 			.subscribe();
 	}
 
-	getControl(name: string): AbstractControl {
-		const control = this.loginForm.get(name);
+	get emailControl() {
+		return this.loginForm.get('email') as FormControl;
+	}
 
-		if (!control) {
-			throw new Error(`No control found with the name: ${name}`);
-		}
-
-		return control;
+	get passwordControl() {
+		return this.loginForm.get('password') as FormControl;
 	}
 
 	/**

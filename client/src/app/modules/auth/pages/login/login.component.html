@@ -20,7 +20,7 @@
 					formControlName="email"
 				/>
 				<app-validation-errors
-					[control]="getControl('email')"
+					[control]="emailControl"
 				></app-validation-errors>
 			</div>
 			<div class="form-group">
@@ -31,7 +31,7 @@
 					id="passwordInput"
 					formControlName="password"
 				/>
-				<app-validation-errors [control]="getControl('password')">
+				<app-validation-errors [control]="passwordControl">
 				</app-validation-errors>
 			</div>
 
