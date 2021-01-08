@@ -5,7 +5,7 @@ import {
 	FormGroup,
 	Validators,
 } from '@angular/forms';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Alert, AlertService } from '@app/alerts';
 import { AuthenticationService } from '@app/services';
 import { EMPTY } from 'rxjs';
@@ -28,6 +28,7 @@ export class SmsChallengeComponent implements OnInit {
 
 	constructor(
 		private formBuilder: FormBuilder,
+		private route: ActivatedRoute,
 		private router: Router,
 		private alertService: AlertService,
 		private authenticationService: AuthenticationService,
@@ -48,9 +49,6 @@ export class SmsChallengeComponent implements OnInit {
 				switchMap(() => {
 					return this.authenticationService.login();
 				}),
-				tap(() => {
-					this.router.navigate(['/']);
-				}),
 				catchError((err) => {
 					this.alertService.error(err, this.alertOptions);
 
@@ -63,7 +61,16 @@ export class SmsChallengeComponent implements OnInit {
 					this.verifyingSms = false;
 				}),
 			)
-			.subscribe();
+			.subscribe(() => {
+				let redirectUrl: string =
+					this.route.snapshot.queryParams['redirectUrl'] || undefined;
+
+				if (redirectUrl) {
+					return this.router.navigateByUrl(redirectUrl);
+				}
+
+				return this.router.navigate(['/']);
+			});
 	}
 
 	resendSms(): void {

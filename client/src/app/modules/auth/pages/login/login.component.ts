@@ -5,7 +5,7 @@ import {
 	FormGroup,
 	Validators,
 } from '@angular/forms';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { AlertService } from '@app/alerts';
 import { AuthenticationService } from '@app/services';
 import { EMPTY } from 'rxjs';
@@ -25,6 +25,7 @@ export class LoginComponent implements OnInit {
 
 	constructor(
 		private formBuilder: FormBuilder,
+		private route: ActivatedRoute,
 		private router: Router,
 		private alertService: AlertService,
 		private authenticationService: AuthenticationService,
@@ -50,9 +51,6 @@ export class LoginComponent implements OnInit {
 		this.authenticationService
 			.requestSmsChallenge()
 			.pipe(
-				tap(() => {
-					this.router.navigate(['challenge', 'sms']);
-				}),
 				catchError((err) => {
 					this.alertService.error(err, {
 						id: this.alertId,
@@ -67,7 +65,17 @@ export class LoginComponent implements OnInit {
 					this.loggingIn = false;
 				}),
 			)
-			.subscribe();
+			.subscribe(() => {
+				const redirectUrl: string =
+					this.route.snapshot.queryParams['redirectUrl'] || undefined;
+
+				// Pass redirect url to challenge route
+				this.router.navigate(['challenge', 'sms'], {
+					queryParams: {
+						redirectUrl,
+					},
+				});
+			});
 	}
 
 	get emailControl() {
