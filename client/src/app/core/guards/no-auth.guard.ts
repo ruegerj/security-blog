@@ -29,7 +29,7 @@ export class NoAuthGuard implements CanActivate, CanActivateChild {
 					this.router.navigate(['/']);
 				}
 
-				return of(isLoggedIn);
+				return of(!isLoggedIn);
 			}),
 		);
 	}
