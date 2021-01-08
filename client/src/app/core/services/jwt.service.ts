@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
-import jwtDecode, { JwtPayload } from 'jwt-decode';
-import { Role } from 'src/app/data/enums';
-import { User } from 'src/app/data/models';
+import jwtDecode from 'jwt-decode';
+import { Role } from '@data/enums';
+import { User } from '@data/models';
 
 /**
  * Service for handling Json Web Tokens

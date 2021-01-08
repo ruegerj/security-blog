@@ -9,7 +9,7 @@ import {
 } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { ApiResponse } from 'src/app/data/models';
+import { ApiResponse } from '@data/models';
 
 /**
  * Interceptor which extracts the data payload of the response if the response format is JSend

@@ -4,15 +4,10 @@ import { environment } from '@env';
 import { NGXLogger } from 'ngx-logger';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { ChallengeType } from 'src/app/data/enums';
-import {
-	AccessToken,
-	User,
-	ChallengeToken,
-	Credentials,
-} from 'src/app/data/models';
-import { Challenge } from 'src/app/data/models/challenge';
-import { AuthStore } from 'src/app/data/stores';
+import { ChallengeType } from '@data/enums';
+import { AccessToken, ChallengeToken, Credentials } from '@data/models';
+import { Challenge } from '@data/models/challenge';
+import { AuthStore } from '@data/stores';
 import { JwtService } from './jwt.service';
 
 /**

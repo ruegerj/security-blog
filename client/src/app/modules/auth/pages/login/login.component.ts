@@ -10,7 +10,7 @@ import { AlertService } from '@app/alerts';
 import { AuthenticationService } from '@app/services';
 import { EMPTY } from 'rxjs';
 import { catchError, finalize, tap } from 'rxjs/operators';
-import { Credentials } from 'src/app/data/models';
+import { Credentials } from '@data/models';
 
 @Component({
 	selector: 'app-login',
