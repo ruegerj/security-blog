@@ -5,7 +5,11 @@ import {
 	FormGroup,
 	Validators,
 } from '@angular/forms';
-import { AlertService } from '@app/alerts';
+import { Router } from '@angular/router';
+import { Alert, AlertService } from '@app/alerts';
+import { AuthenticationService } from '@app/services';
+import { EMPTY } from 'rxjs';
+import { catchError, finalize, switchMap, tap } from 'rxjs/operators';
 
 @Component({
 	selector: 'app-sms-challenge',
@@ -18,9 +22,15 @@ export class SmsChallengeComponent implements OnInit {
 	verifyingSms: boolean = false;
 	alertId = 'challenge-alert';
 
+	private alertOptions: Partial<Alert> = {
+		id: this.alertId,
+	};
+
 	constructor(
 		private formBuilder: FormBuilder,
+		private router: Router,
 		private alertService: AlertService,
+		private authenticationService: AuthenticationService,
 	) {
 		this.smsVerifyForm = this.createForm();
 	}
@@ -28,24 +38,59 @@ export class SmsChallengeComponent implements OnInit {
 	ngOnInit(): void {}
 
 	verifySms(): void {
-		// Testing only
 		this.verifyingSms = true;
 
-		setTimeout(() => {
-			this.verifyingSms = false;
-		}, 4000);
+		const code = this.smsCodeControl?.value;
+
+		this.authenticationService
+			.verifySmsChallenge(code)
+			.pipe(
+				switchMap(() => {
+					return this.authenticationService.login();
+				}),
+				tap(() => {
+					this.router.navigate(['/']);
+				}),
+				catchError((err) => {
+					this.alertService.error(err, this.alertOptions);
+
+					// Clear sms code field
+					this.smsCodeControl?.setValue('');
+
+					return EMPTY;
+				}),
+				finalize(() => {
+					this.verifyingSms = false;
+				}),
+			)
+			.subscribe();
 	}
 
 	resendSms(): void {
-		// Testing only
 		this.sendingSms = true;
 
-		setTimeout(() => {
-			this.sendingSms = false;
-			this.alertService.success('New SMS code was sendt', {
-				id: this.alertId,
-			});
-		}, 3000);
+		this.authenticationService
+			.requestSmsChallenge()
+			.pipe(
+				tap(() => {
+					this.alertService.success(
+						'New SMS code has been sendt',
+						this.alertOptions,
+					);
+				}),
+				catchError((err) => {
+					this.alertService.error(
+						`Encountered error while sending SMS: ${err}`,
+						this.alertOptions,
+					);
+
+					return EMPTY;
+				}),
+				finalize(() => {
+					this.sendingSms = false;
+				}),
+			)
+			.subscribe();
 	}
 
 	get smsCodeControl() {

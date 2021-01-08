@@ -58,7 +58,8 @@ export class LoginComponent implements OnInit {
 						id: this.alertId,
 					});
 
-					this.clearPasswordField();
+					// Clear password field
+					this.passwordControl?.setValue('');
 
 					return EMPTY;
 				}),
@@ -75,19 +76,6 @@ export class LoginComponent implements OnInit {
 
 	get passwordControl() {
 		return this.loginForm.get('password') as FormControl;
-	}
-
-	/**
-	 * Clears the password field
-	 */
-	private clearPasswordField(): void {
-		const control = this.loginForm.get('password');
-
-		if (!control) {
-			return;
-		}
-
-		control.setValue('');
 	}
 
 	private createLoginForm(): FormGroup {
