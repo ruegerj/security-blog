@@ -13,6 +13,11 @@ export class AuthQuery extends Query<AuthState> {
 	 */
 	isLoggedIn$ = this.select((state) => toBoolean(state.user));
 
+	/**
+	 * Returns the registered user in the store
+	 */
+	authenticatedUser$ = this.select((state) => state.user);
+
 	constructor(protected store: AuthStore) {
 		super(store);
 	}
