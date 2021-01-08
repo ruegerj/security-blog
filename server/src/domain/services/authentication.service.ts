@@ -2,6 +2,7 @@ import { User } from '@data-access/entities';
 import { IUnitOfWorkFactory } from '@data-access/uow/factory/interfaces';
 import { IUnitOfWork } from '@data-access/uow/interfaces';
 import { LoginDto, SignUpDto, TokenResponseDto } from '@domain/dtos';
+import { Role } from '@domain/dtos/enums/role.enum';
 import { ICredentials } from '@domain/dtos/interfaces';
 import { IConfig } from '@infrastructure/config/interfaces';
 import {
@@ -360,6 +361,10 @@ export class AuthenticationService implements IAuthenticationService {
 		user.password = passwordHash;
 		user.phone = model.phone;
 		user.tokenVersion = -1; // user hasn't logged in yet => -1
+
+		// Assign user role to new users per default
+		const userRole = await signUpUserUnit.roles.getByName(Role.User);
+		user.roles = [userRole];
 
 		const createdUser = await signUpUserUnit.users.add(user);
 

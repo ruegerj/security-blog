@@ -7,4 +7,17 @@ import { RepositoryBase } from './repository.base';
  */
 export class RoleRepository
 	extends RepositoryBase<Role>
-	implements IRoleRepository {}
+	implements IRoleRepository {
+	/**
+	 * Returns the role with the provided name
+	 * @param name Name of the requested role
+	 * @returns First found role or null
+	 */
+	getByName(name: string): Promise<Role> {
+		return this.repository.findOne({
+			where: {
+				name,
+			},
+		});
+	}
+}
