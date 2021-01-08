@@ -3,15 +3,16 @@ import { Injectable } from '@angular/core';
 import { environment } from '@env';
 import { NGXLogger } from 'ngx-logger';
 import { Observable } from 'rxjs';
-import { tap } from 'rxjs/operators';
+import { map } from 'rxjs/operators';
 import { ChallengeType } from 'src/app/data/enums';
 import {
 	AccessToken,
-	AuthenticatedUser,
+	User,
 	ChallengeToken,
 	Credentials,
 } from 'src/app/data/models';
 import { Challenge } from 'src/app/data/models/challenge';
+import { AuthStore } from 'src/app/data/stores';
 import { JwtService } from './jwt.service';
 
 /**
@@ -36,13 +37,9 @@ export class AuthenticationService {
 	 */
 	private challengeToken?: string;
 
-	/**
-	 * Currently signed in user
-	 */
-	private authenticatedUser?: AuthenticatedUser;
-
 	constructor(
 		private httpClient: HttpClient,
+		private authStore: AuthStore,
 		private jwtService: JwtService,
 		private logger: NGXLogger,
 	) {}
@@ -58,7 +55,7 @@ export class AuthenticationService {
 	/**
 	 * Requests a SMS challenge for the given user
 	 */
-	requestSmsChallenge(): Observable<Challenge> {
+	requestSmsChallenge(): Observable<void> {
 		const requestData = {
 			...this.userCredentials,
 			type: ChallengeType.SMS,
@@ -67,7 +64,7 @@ export class AuthenticationService {
 		const requestUrl = `${environment.apiBasePath}/challenge/get`;
 
 		return this.httpClient.post<Challenge>(requestUrl, requestData).pipe(
-			tap((challenge) => {
+			map((challenge) => {
 				this.challengeId = challenge.challengeId || this.challengeId;
 
 				this.logger.info(
@@ -81,7 +78,7 @@ export class AuthenticationService {
 	 * Attempts to verify the given sms challenge code
 	 * @param code Code received as an sms which should be validated
 	 */
-	verifySmsChallenge(code: string): Observable<ChallengeToken> {
+	verifySmsChallenge(code: string): Observable<void> {
 		const requestData = {
 			...this.userCredentials,
 			challengeId: this.challengeId,
@@ -94,7 +91,7 @@ export class AuthenticationService {
 		return this.httpClient
 			.post<ChallengeToken>(requestUrl, requestData)
 			.pipe(
-				tap((token) => {
+				map((token) => {
 					// Assign challenge token / reset challengeId
 					this.challengeToken =
 						token.challengeToken || this.challengeToken;
@@ -110,7 +107,7 @@ export class AuthenticationService {
 	/**
 	 * Attemtpts to login the current user with the local credentials and challenge token
 	 */
-	login(): Observable<AccessToken> {
+	login(): Observable<void> {
 		const requestData = {
 			...this.userCredentials,
 		};
@@ -127,15 +124,15 @@ export class AuthenticationService {
 				headers,
 			})
 			.pipe(
-				tap((response) => {
-					this.authenticatedUser = this.jwtService.parseAccessToken(
+				map((response) => {
+					const authenticatedUser = this.jwtService.parseAccessToken(
 						response.token,
 					);
 
-					console.log(this.authenticatedUser);
+					this.authStore.login(authenticatedUser);
 
 					this.logger.info(
-						`Successfuly logged in as: ${this.authenticatedUser.email}`,
+						`Successfuly logged in as: ${authenticatedUser.email}`,
 					);
 
 					// Reset credentials and challengeToken to prevent eventual leaks

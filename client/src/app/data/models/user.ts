@@ -3,7 +3,7 @@ import { Role } from '../enums';
 /**
  * Interface for an authenticated user
  */
-export interface AuthenticatedUser {
+export interface User {
 	/**
 	 * Id of the user
 	 */
@@ -22,9 +22,4 @@ export interface AuthenticatedUser {
 	 * Collection of the users assigned roles
 	 */
 	roles: Role[];
-
-	/**
-	 * Timestamp when the current access token will be invalid
-	 */
-	loginExpires: Date;
 }
