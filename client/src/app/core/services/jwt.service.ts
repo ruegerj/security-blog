@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import jwtDecode from 'jwt-decode';
+import jwtDecode, { JwtPayload } from 'jwt-decode';
 import { Role } from '@data/enums';
 import { User } from '@data/models';
 
@@ -25,6 +25,22 @@ export class JwtService {
 			phone: claims.phone,
 			roles: claims.roles as Role[],
 		};
+	}
+
+	/**
+	 * Parses the expiry date from the tokens payload
+	 * @param token JWT whose expiry is requested
+	 * @throws Error no expiry date is present in the tokens payload
+	 */
+	getExpiryDate(token: string): Date {
+		const claims: JwtPayload = jwtDecode(token);
+
+		if (!claims.exp) {
+			throw new Error('No "expiresIn" claim present on provided token');
+		}
+
+		// Convert unix to date
+		return new Date(claims.exp * 1000);
 	}
 }
 

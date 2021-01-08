@@ -73,10 +73,10 @@ export class SmsChallengeComponent implements OnInit {
 			.requestSmsChallenge()
 			.pipe(
 				tap(() => {
-					this.alertService.success(
-						'New SMS code has been sendt',
-						this.alertOptions,
-					);
+					this.alertService.success('New SMS code has been sendt', {
+						...this.alertOptions,
+						autoClose: true,
+					});
 				}),
 				catchError((err) => {
 					this.alertService.error(

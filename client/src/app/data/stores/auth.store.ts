@@ -31,6 +31,6 @@ export class AuthStore extends Store<AuthState> {
 	}
 }
 
-export const initialState: AuthState = {
+const initialState: AuthState = {
 	user: null,
 };

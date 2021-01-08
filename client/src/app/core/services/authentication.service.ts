@@ -2,13 +2,14 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from '@env';
 import { NGXLogger } from 'ngx-logger';
-import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { Observable, throwError } from 'rxjs';
+import { map, switchMap, take } from 'rxjs/operators';
 import { ChallengeType } from '@data/enums';
 import { AccessToken, ChallengeToken, Credentials } from '@data/models';
 import { Challenge } from '@data/models/challenge';
-import { AuthStore } from '@data/stores';
+import { AuthStore, CredentialsStore } from '@data/stores';
 import { JwtService } from './jwt.service';
+import { CredentialsQuery } from '@data/queries/credentials.query';
 
 /**
  * Service which handles all authentication related operations
@@ -17,11 +18,6 @@ import { JwtService } from './jwt.service';
 	providedIn: 'root',
 })
 export class AuthenticationService {
-	/**
-	 * Subject for sharing credentials across components
-	 */
-	private userCredentials?: Credentials;
-
 	/**
 	 * Latest challenge-id the user has issued
 	 */
@@ -35,6 +31,8 @@ export class AuthenticationService {
 	constructor(
 		private httpClient: HttpClient,
 		private authStore: AuthStore,
+		private credentialsStore: CredentialsStore,
+		private credentialsQuery: CredentialsQuery,
 		private jwtService: JwtService,
 		private logger: NGXLogger,
 	) {}
@@ -44,27 +42,40 @@ export class AuthenticationService {
 	 * @param credentials Credentials which should be set
 	 */
 	setCredentials(credentials: Credentials): void {
-		this.userCredentials = credentials;
+		this.credentialsStore.setCredentials(credentials);
 	}
 
 	/**
 	 * Requests a SMS challenge for the given user
 	 */
 	requestSmsChallenge(): Observable<void> {
-		const requestData = {
-			...this.userCredentials,
-			type: ChallengeType.SMS,
-		};
+		return this.credentialsQuery.credentials$.pipe(
+			take(1),
+			switchMap((credentials) => {
+				if (!credentials) {
+					return throwError('Missing user credentials');
+				}
 
-		const requestUrl = `${environment.apiBasePath}/challenge/get`;
+				const requestData = {
+					email: credentials.email,
+					password: credentials.password,
+					type: ChallengeType.SMS,
+				};
 
-		return this.httpClient.post<Challenge>(requestUrl, requestData).pipe(
-			map((challenge) => {
-				this.challengeId = challenge.challengeId || this.challengeId;
+				const requestUrl = `${environment.apiBasePath}/challenge/get`;
 
-				this.logger.info(
-					`Successfuly obtained challenge of type: ${ChallengeType.SMS}`,
-				);
+				return this.httpClient
+					.post<Challenge>(requestUrl, requestData)
+					.pipe(
+						map((challenge) => {
+							this.challengeId =
+								challenge.challengeId || this.challengeId;
+
+							this.logger.info(
+								`Successfuly obtained challenge of type: ${ChallengeType.SMS}`,
+							);
+						}),
+					);
 			}),
 		);
 	}
@@ -74,66 +85,95 @@ export class AuthenticationService {
 	 * @param code Code received as an sms which should be validated
 	 */
 	verifySmsChallenge(code: string): Observable<void> {
-		const requestData = {
-			...this.userCredentials,
-			challengeId: this.challengeId,
-			type: ChallengeType.SMS,
-			token: code,
-		};
+		return this.credentialsQuery.credentials$.pipe(
+			take(1),
+			switchMap((credentials) => {
+				if (!credentials) {
+					return throwError('Missing user credentials');
+				}
 
-		const requestUrl = `${environment.apiBasePath}/challenge/verify`;
+				const requestData = {
+					email: credentials.email,
+					password: credentials.password,
+					challengeId: this.challengeId,
+					type: ChallengeType.SMS,
+					token: code,
+				};
 
-		return this.httpClient
-			.post<ChallengeToken>(requestUrl, requestData)
-			.pipe(
-				map((token) => {
-					// Assign challenge token / reset challengeId
-					this.challengeToken =
-						token.challengeToken || this.challengeToken;
-					this.challengeId = undefined;
+				const requestUrl = `${environment.apiBasePath}/challenge/verify`;
 
-					this.logger.info(
-						`Successfuly verified challenge of type: ${ChallengeType.SMS}`,
+				return this.httpClient
+					.post<ChallengeToken>(requestUrl, requestData)
+					.pipe(
+						map((token) => {
+							// Assign challenge token / reset challengeId
+							this.challengeToken =
+								token.challengeToken || this.challengeToken;
+							this.challengeId = undefined;
+
+							this.logger.info(
+								`Successfuly verified challenge of type: ${ChallengeType.SMS}`,
+							);
+						}),
 					);
-				}),
-			);
+			}),
+		);
 	}
 
 	/**
 	 * Attemtpts to login the current user with the local credentials and challenge token
 	 */
 	login(): Observable<void> {
-		const requestData = {
-			...this.userCredentials,
-		};
+		return this.credentialsQuery.credentials$.pipe(
+			take(1),
+			switchMap((credentials) => {
+				if (!credentials) {
+					return throwError('Missing user credentials');
+				}
 
-		const requestUrl = `${environment.apiBasePath}/auth/login`;
+				const requestData = {
+					email: credentials.email,
+					password: credentials.password,
+				};
 
-		const headers = new HttpHeaders().append(
-			'Authorization',
-			`authType="${ChallengeType.SMS}" token="${this.challengeToken}"`,
+				const requestUrl = `${environment.apiBasePath}/auth/login`;
+
+				const headers = new HttpHeaders().append(
+					'Authorization',
+					`authType="${ChallengeType.SMS}" token="${this.challengeToken}"`,
+				);
+
+				return this.httpClient
+					.post<AccessToken>(requestUrl, requestData, {
+						headers,
+					})
+					.pipe(
+						map((response) => {
+							const authenticatedUser = this.jwtService.parseAccessToken(
+								response.token,
+							);
+
+							const expiresAt = this.jwtService.getExpiryDate(
+								response.token,
+							);
+
+							// Store user & token in stores
+							this.authStore.login(authenticatedUser);
+							this.credentialsStore.setAccessToken(
+								response.token,
+								expiresAt,
+							);
+
+							this.logger.info(
+								`Successfuly logged in as: ${authenticatedUser.email}`,
+							);
+
+							// Reset credentials and challengeToken to prevent eventual leaks
+							this.credentialsStore.removeCredentials();
+							this.challengeToken = undefined;
+						}),
+					);
+			}),
 		);
-
-		return this.httpClient
-			.post<AccessToken>(requestUrl, requestData, {
-				headers,
-			})
-			.pipe(
-				map((response) => {
-					const authenticatedUser = this.jwtService.parseAccessToken(
-						response.token,
-					);
-
-					this.authStore.login(authenticatedUser);
-
-					this.logger.info(
-						`Successfuly logged in as: ${authenticatedUser.email}`,
-					);
-
-					// Reset credentials and challengeToken to prevent eventual leaks
-					this.userCredentials = undefined;
-					this.challengeToken = undefined;
-				}),
-			);
 	}
 }
