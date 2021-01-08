@@ -19,11 +19,11 @@ export abstract class RepositoryBase<TEntity extends IEntity>
 
 	async add(item: TEntity): Promise<TEntity> {
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		const result = await this.repository.insert({ ...(item as any) });
+		const partialItem = { ...(item as any) };
 
-		item.id = result.identifiers[0].id; // Only one entity added => take first id
+		await this.repository.save(partialItem);
 
-		return item;
+		return partialItem;
 	}
 
 	async update(item: TEntity): Promise<TEntity> {
