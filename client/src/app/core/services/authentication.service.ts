@@ -5,11 +5,11 @@ import { NGXLogger } from 'ngx-logger';
 import { Observable, throwError } from 'rxjs';
 import { map, switchMap, take } from 'rxjs/operators';
 import { ChallengeType } from '@data/enums';
-import { AccessToken, ChallengeToken, Credentials } from '@data/models';
+import { AccessToken, ChallengeToken, Credentials, User } from '@data/models';
 import { Challenge } from '@data/models/challenge';
 import { AuthStore, CredentialsStore } from '@data/stores';
+import { AuthQuery, CredentialsQuery } from '@data/queries';
 import { JwtService } from './jwt.service';
-import { CredentialsQuery } from '@data/queries/credentials.query';
 
 /**
  * Service which handles all authentication related operations
@@ -32,6 +32,7 @@ export class AuthenticationService {
 		private httpClient: HttpClient,
 		private authStore: AuthStore,
 		private credentialsStore: CredentialsStore,
+		private authQuery: AuthQuery,
 		private credentialsQuery: CredentialsQuery,
 		private jwtService: JwtService,
 		private logger: NGXLogger,
@@ -149,19 +150,8 @@ export class AuthenticationService {
 					})
 					.pipe(
 						map((response) => {
-							const authenticatedUser = this.jwtService.parseAccessToken(
+							const authenticatedUser = this.loginUserByToken(
 								response.token,
-							);
-
-							const expiresAt = this.jwtService.getExpiryDate(
-								response.token,
-							);
-
-							// Store user & token in stores
-							this.authStore.login(authenticatedUser);
-							this.credentialsStore.setAccessToken(
-								response.token,
-								expiresAt,
 							);
 
 							this.logger.info(
@@ -175,5 +165,64 @@ export class AuthenticationService {
 					);
 			}),
 		);
+	}
+
+	/**
+	 * Attempts to refresh the current access token using the refresh token
+	 */
+	refreshToken(): Observable<void> {
+		const requestUrl = `${environment}/auth/refresh`;
+
+		return this.httpClient.post<AccessToken>(requestUrl, undefined).pipe(
+			map((response) => {
+				const authenticatedUser = this.loginUserByToken(response.token);
+
+				this.logger.info(
+					`Successfuly refreshed token for: ${authenticatedUser.email}`,
+				);
+			}),
+		);
+	}
+
+	/**
+	 * Logs the current user out and
+	 */
+	logout(): Observable<void> {
+		const requestUrl = `${environment}/auth/logout`;
+
+		return this.authQuery.isLoggedIn$.pipe(
+			take(1),
+			switchMap((isLoggedIn) => {
+				if (!isLoggedIn) {
+					return throwError(
+						'No user logged in, therefore unable to perform logout',
+					);
+				}
+
+				return this.httpClient.post(requestUrl, undefined).pipe(
+					map(() => {
+						// Reset user data & access token
+						this.authStore.logout();
+						this.credentialsStore.revokeAccessToken();
+					}),
+				);
+			}),
+		);
+	}
+
+	/**
+	 * Parses the given token and stores the corresponding user and the token itself accordingly
+	 * @param token Access token which should be registered in the application
+	 */
+	private loginUserByToken(token: string): User {
+		const authenticatedUser = this.jwtService.parseAccessToken(token);
+
+		const expiresAt = this.jwtService.getExpiryDate(token);
+
+		// Store user & token in stores
+		this.authStore.login(authenticatedUser);
+		this.credentialsStore.setAccessToken(token, expiresAt);
+
+		return authenticatedUser;
 	}
 }
