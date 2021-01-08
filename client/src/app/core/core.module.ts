@@ -1,6 +1,11 @@
 import { NgModule, Optional, SkipSelf } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { AuthGuard, throwIfAlreadyLoaded } from './guards';
+import {
+	AuthGuard,
+	CredentialsRequiredGuard,
+	NoAuthGuard,
+	throwIfAlreadyLoaded,
+} from './guards';
 import { LoggerModule, NgxLoggerLevel } from 'ngx-logger';
 import { environment } from '@env';
 import { HttpClientModule } from '@angular/common/http';
@@ -26,6 +31,8 @@ import {
 	providers: [
 		// Guards
 		AuthGuard,
+		NoAuthGuard,
+		CredentialsRequiredGuard,
 		// Interceptors
 		LoggingInterceptorProvider,
 		ErrorInterceptorProvider,
