@@ -185,7 +185,7 @@ export class AuthenticationService {
 	}
 
 	/**
-	 * Logs the current user out and
+	 * Logs the current user out and updates the affected stores accordingly
 	 */
 	logout(): Observable<void> {
 		const requestUrl = `${environment}/auth/logout`;
