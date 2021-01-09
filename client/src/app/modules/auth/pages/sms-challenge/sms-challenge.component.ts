@@ -8,6 +8,8 @@ import {
 import { ActivatedRoute, Router } from '@angular/router';
 import { Alert, AlertService } from '@app/alerts';
 import { AuthenticationService, ChallengeService } from '@app/services';
+import { Role } from '@data/enums';
+import { AuthQuery } from '@data/queries';
 import { EMPTY } from 'rxjs';
 import { catchError, finalize, switchMap, tap } from 'rxjs/operators';
 
@@ -32,6 +34,7 @@ export class SmsChallengeComponent implements OnInit {
 		private router: Router,
 		private alertService: AlertService,
 		private authenticationService: AuthenticationService,
+		private authQuery: AuthQuery,
 		private challengeService: ChallengeService,
 	) {
 		this.smsVerifyForm = this.createForm();
@@ -60,6 +63,18 @@ export class SmsChallengeComponent implements OnInit {
 						verifiedChallenge.challengeToken,
 					);
 				}),
+				switchMap(() => {
+					let redirectUrl: string =
+						this.route.snapshot.queryParams['redirectUrl'] ||
+						undefined;
+
+					if (redirectUrl) {
+						this.router.navigateByUrl(redirectUrl);
+						return EMPTY;
+					}
+
+					return this.authQuery.authenticatedUser$;
+				}),
 				catchError((err) => {
 					this.alertService.error(err, this.alertOptions);
 
@@ -72,15 +87,24 @@ export class SmsChallengeComponent implements OnInit {
 					this.verifyingSms = false;
 				}),
 			)
-			.subscribe(() => {
-				let redirectUrl: string =
-					this.route.snapshot.queryParams['redirectUrl'] || undefined;
-
-				if (redirectUrl) {
-					return this.router.navigateByUrl(redirectUrl);
+			.subscribe((user) => {
+				// About routing due to earlier redirect
+				if (!user) {
+					return;
 				}
 
-				return this.router.navigate(['/']);
+				let routeFragments: string[] = [];
+
+				// Navigate to the corresponding dashboard based uppon the users roles
+				if (user.roles.includes(Role.Admin)) {
+					routeFragments = ['admin', 'dashboard'];
+				} else if (user.roles.includes(Role.User)) {
+					routeFragments = ['user', 'dashboard'];
+				} else {
+					routeFragments = ['/'];
+				}
+
+				return this.router.navigate(routeFragments);
 			});
 	}
 

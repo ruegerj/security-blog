@@ -15,7 +15,15 @@ const routes: Routes = [
 	{
 		path: '',
 		component: ContentLayoutComponent,
-		children: [],
+		children: [
+			{
+				path: 'user',
+				loadChildren: () =>
+					import('@modules/user/user.module').then(
+						(m) => m.UserModule,
+					),
+			},
+		],
 	},
 	// Fallback for unmatched routes
 	{
