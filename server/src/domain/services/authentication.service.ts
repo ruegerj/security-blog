@@ -356,6 +356,9 @@ export class AuthenticationService implements IAuthenticationService {
 			model.phone = model.phone.substr(1, model.phone.length);
 		}
 
+		// Replace any whitespaces
+		model.phone.replace(/\s+/g, '');
+
 		const user = new User();
 		user.email = model.email;
 		user.password = passwordHash;
