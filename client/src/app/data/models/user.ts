@@ -10,6 +10,11 @@ export interface User {
 	id: string;
 
 	/**
+	 * Username of the user
+	 */
+	username: string;
+
+	/**
 	 * Email of the user
 	 */
 	email: string;

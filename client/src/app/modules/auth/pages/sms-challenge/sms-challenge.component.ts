@@ -7,7 +7,7 @@ import {
 } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Alert, AlertService } from '@app/alerts';
-import { AuthenticationService } from '@app/services';
+import { AuthenticationService, ChallengeService } from '@app/services';
 import { EMPTY } from 'rxjs';
 import { catchError, finalize, switchMap, tap } from 'rxjs/operators';
 
@@ -32,6 +32,7 @@ export class SmsChallengeComponent implements OnInit {
 		private router: Router,
 		private alertService: AlertService,
 		private authenticationService: AuthenticationService,
+		private challengeService: ChallengeService,
 	) {
 		this.smsVerifyForm = this.createForm();
 	}
@@ -43,11 +44,13 @@ export class SmsChallengeComponent implements OnInit {
 
 		const code = this.smsCodeControl?.value;
 
-		this.authenticationService
+		this.challengeService
 			.verifySmsChallenge(code)
 			.pipe(
-				switchMap(() => {
-					return this.authenticationService.login();
+				switchMap((verifiedChallenge) => {
+					return this.authenticationService.login(
+						verifiedChallenge.challengeToken,
+					);
 				}),
 				catchError((err) => {
 					this.alertService.error(err, this.alertOptions);
@@ -76,7 +79,7 @@ export class SmsChallengeComponent implements OnInit {
 	resendSms(): void {
 		this.sendingSms = true;
 
-		this.authenticationService
+		this.challengeService
 			.requestSmsChallenge()
 			.pipe(
 				tap(() => {

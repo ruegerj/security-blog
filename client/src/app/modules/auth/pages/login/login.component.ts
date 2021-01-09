@@ -7,7 +7,7 @@ import {
 } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AlertService } from '@app/alerts';
-import { AuthenticationService } from '@app/services';
+import { AuthenticationService, ChallengeService } from '@app/services';
 import { EMPTY } from 'rxjs';
 import { catchError, finalize, tap } from 'rxjs/operators';
 import { Credentials } from '@data/models';
@@ -29,6 +29,7 @@ export class LoginComponent implements OnInit {
 		private router: Router,
 		private alertService: AlertService,
 		private authenticationService: AuthenticationService,
+		private challengeService: ChallengeService,
 	) {
 		this.loginForm = this.createLoginForm();
 	}
@@ -48,7 +49,7 @@ export class LoginComponent implements OnInit {
 
 		this.authenticationService.setCredentials(credentials);
 
-		this.authenticationService
+		this.challengeService
 			.requestSmsChallenge()
 			.pipe(
 				catchError((err) => {

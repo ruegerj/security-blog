@@ -21,6 +21,7 @@ export class JwtService {
 
 		return {
 			id: claims.sub,
+			username: claims.username,
 			email: claims.email,
 			phone: claims.phone,
 			roles: claims.roles as Role[],
@@ -52,7 +53,7 @@ interface AccessTokenClaims {
 	 * Subject of the token (e.g. user id)
 	 */
 	sub: string;
-
+	username: string;
 	email: string;
 	phone: string;
 	roles: string[];
