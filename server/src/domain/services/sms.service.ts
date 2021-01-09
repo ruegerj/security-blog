@@ -47,7 +47,7 @@ export class SmsService implements ISmsService {
 
 		if (!response.ok) {
 			this.logger.error(
-				`SMS send request failed for number "${number}"`,
+				'SMS send request failed',
 				number,
 				response.status,
 				response.statusText,

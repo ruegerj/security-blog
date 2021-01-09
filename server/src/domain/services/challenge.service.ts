@@ -119,6 +119,8 @@ export class ChallengeService implements IChallengeService {
 			this.logger.error(
 				'Encountered error while sending sms code',
 				error,
+				authenticatedUser.id,
+				authenticatedUser.phone,
 			);
 
 			// Attempt rollback
@@ -254,7 +256,7 @@ export class ChallengeService implements IChallengeService {
 		const validForMinutes =
 			this.config.challenge.smsTokenValidFor / 1000 / 60;
 
-		return `Login @Security-Blog\nYour SMS token is: ${code}\nPlease note that this token is only valid for ${validForMinutes} minutes.`;
+		return `Login @Security-Blog\nYour SMS token is: ${code}\nPlease note that this token is only valid for ${validForMinutes} minutes or until a new token is requested.`;
 	}
 
 	/**
