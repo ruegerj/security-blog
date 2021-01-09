@@ -2,7 +2,7 @@ import { SmsToken } from '@data-access/entities';
 import { IUnitOfWorkFactory } from '@data-access/uow/factory/interfaces';
 import { IUnitOfWork } from '@data-access/uow/interfaces';
 import { ChallengeVerifyDto } from '@domain/dtos';
-import { ChallengeType } from '@domain/dtos/enums';
+import { ChallengeType, LoginAttemptType } from '@domain/dtos/enums';
 import { ICredentials } from '@domain/dtos/interfaces';
 import { IConfig } from '@infrastructure/config/interfaces';
 import {
@@ -54,22 +54,10 @@ export class ChallengeService implements IChallengeService {
 	 * @returns Id of the issued sms token
 	 */
 	async requestSmsChallenge(credentials: ICredentials): Promise<string> {
-		const authenticatedUser = await this.authenticationService.getAuthenticatedUser(
-			credentials,
-		);
-
-		// Invalid credentials => abort request
-		if (!authenticatedUser) {
-			// TODO: Store failed attempt
-			// this.loginAttemptService.createAttempt(false, credentials.email);
-
-			// Abort request as unauthorized
-			throw new UnauthorizedError('Invalid credentials');
-		}
-
 		// Check if attempts have been exceeded
-		const attempsExceeded = await this.authenticationService.loginAttemptsExceeded(
-			authenticatedUser,
+		const attempsExceeded = await this.loginAttemptService.loginAttemptsExceeded(
+			credentials.userIdentity,
+			LoginAttemptType.Login,
 		);
 
 		if (attempsExceeded) {
@@ -78,13 +66,31 @@ export class ChallengeService implements IChallengeService {
 
 			this.logger.warn(
 				'Blocked challenge request due to too many failed login attempts',
-				authenticatedUser.email,
+				credentials.userIdentity,
 			);
 
 			throw new TooManyRequestsError(
 				`Too many failed login requests. Try again in ${windowMinutes} minutes`,
 				windowMinutes * 60,
 			);
+		}
+
+		// Try validate provided credentials
+		const authenticatedUser = await this.authenticationService.getAuthenticatedUser(
+			credentials,
+		);
+
+		// Invalid credentials => abort request
+		if (!authenticatedUser) {
+			// Store failed attempt
+			this.loginAttemptService.createAttempt(
+				LoginAttemptType.Login,
+				false,
+				credentials.userIdentity,
+			);
+
+			// Abort request as unauthorized
+			throw new UnauthorizedError('Invalid credentials');
 		}
 
 		let challengeUnit: IUnitOfWork;
@@ -137,22 +143,10 @@ export class ChallengeService implements IChallengeService {
 	 * @returns A challenge token which confirms the validity of the second factor
 	 */
 	async verifySmsChallenge(model: ChallengeVerifyDto): Promise<string> {
-		const authenticatedUser = await this.authenticationService.getAuthenticatedUser(
-			model,
-		);
-
-		// Invalid credentials => abort request
-		if (!authenticatedUser) {
-			// TODO: Store failed attempt
-			// this.loginAttemptService.createAttempt(false, model.email);
-
-			// Abort request as unauthorized
-			throw new UnauthorizedError('Invalid credentials');
-		}
-
 		// Check if attempts have been exceeded
-		const attempsExceeded = await this.authenticationService.loginAttemptsExceeded(
-			authenticatedUser,
+		const attempsExceeded = await this.loginAttemptService.loginAttemptsExceeded(
+			model.userIdentity,
+			LoginAttemptType.Challenge,
 		);
 
 		if (attempsExceeded) {
@@ -161,13 +155,30 @@ export class ChallengeService implements IChallengeService {
 
 			this.logger.warn(
 				'Blocked challenge verify due to too many failed login attempts',
-				authenticatedUser.email,
+				model.userIdentity,
 			);
 
 			throw new TooManyRequestsError(
 				`Too many failed login requests. Try again in ${windowMinutes} minutes`,
 				windowMinutes * 60,
 			);
+		}
+
+		const authenticatedUser = await this.authenticationService.getAuthenticatedUser(
+			model,
+		);
+
+		// Invalid credentials => abort request
+		if (!authenticatedUser) {
+			// Store failed attempt
+			this.loginAttemptService.createAttempt(
+				LoginAttemptType.Login,
+				false,
+				model.userIdentity,
+			);
+
+			// Abort request as unauthorized
+			throw new UnauthorizedError('Invalid credentials');
 		}
 
 		let challengeUnit: IUnitOfWork;
@@ -185,13 +196,11 @@ export class ChallengeService implements IChallengeService {
 			);
 
 			if (!smsToken) {
-				// TODO: Register failed request
 				throw new BadRequestError('Invalid challenge id');
 			}
 
 			// Check if provided token is latest token issued
 			if (smsToken.id != latestToken.id) {
-				// TODO: Reqister failed request
 				throw new BadRequestError(
 					'Challenge expired, a new sms token was issued in the meantime',
 				);
@@ -199,13 +208,11 @@ export class ChallengeService implements IChallengeService {
 
 			// Check if tokens match
 			if (model.token !== smsToken.token) {
-				// TODO: Register failed requst
 				throw new BadRequestError('Invalid sms token');
 			}
 
 			// Check if token was already redeemed
 			if (smsToken.redeemed) {
-				// TODO: Reqister failed request
 				throw new BadRequestError('SMS token was already redeemed');
 			}
 
@@ -217,7 +224,6 @@ export class ChallengeService implements IChallengeService {
 			const now = new Date().valueOf();
 
 			if (now >= expiryDate) {
-				// TODO: Reqister failed request
 				throw new BadRequestError('SMS token has expired');
 			}
 
@@ -233,6 +239,13 @@ export class ChallengeService implements IChallengeService {
 
 			await challengeUnit.commit();
 
+			// Store successful attempt
+			await this.loginAttemptService.createAttempt(
+				LoginAttemptType.Challenge,
+				true,
+				authenticatedUser.email,
+			);
+
 			return challengeToken;
 		} catch (error) {
 			this.logger.error(
@@ -242,6 +255,15 @@ export class ChallengeService implements IChallengeService {
 
 			// Attempt rollback
 			await challengeUnit?.rollback();
+
+			// If token validation failed => store attempt
+			if (error instanceof BadRequestError) {
+				await this.loginAttemptService.createAttempt(
+					LoginAttemptType.Challenge,
+					false,
+					authenticatedUser.email,
+				);
+			}
 
 			// Rethrow error so request fails
 			throw error;

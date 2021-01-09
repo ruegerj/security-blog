@@ -2,6 +2,7 @@ import { User } from '@data-access/entities';
 import { IUnitOfWorkFactory } from '@data-access/uow/factory/interfaces';
 import { IUnitOfWork } from '@data-access/uow/interfaces';
 import { LoginDto, SignUpDto, TokenResponseDto } from '@domain/dtos';
+import { LoginAttemptType } from '@domain/dtos/enums';
 import { Role } from '@domain/dtos/enums/role.enum';
 import { ICredentials } from '@domain/dtos/interfaces';
 import { IConfig } from '@infrastructure/config/interfaces';
@@ -51,12 +52,37 @@ export class AuthenticationService implements IAuthenticationService {
 	 * @returns Dto containing both access- and refresh-token for the user
 	 */
 	async login(model: LoginDto): Promise<TokenResponseDto> {
+		// Check if attempts have been exceeded
+		const attempsExceeded = await this.loginAttemptService.loginAttemptsExceeded(
+			model.userIdentity,
+			LoginAttemptType.Login,
+		);
+
+		if (attempsExceeded) {
+			const windowMinutes =
+				this.config.auth.loginTimeWindowMS / 1000 / 60;
+
+			this.logger.warn(
+				'Blocked login request due to too many failed login attempts',
+				model.userIdentity,
+			);
+
+			throw new TooManyRequestsError(
+				`Too many failed login requests. Try again in ${windowMinutes} minutes`,
+				windowMinutes * 60,
+			);
+		}
+
 		const authenticatedUser = await this.getAuthenticatedUser(model);
 
 		// Credentials invalid => abort request
 		if (!authenticatedUser) {
-			// TODO: Store failed attempt
-			// this.loginAttemptService.createAttempt(false, model.email);
+			// Store failed attempt
+			this.loginAttemptService.createAttempt(
+				LoginAttemptType.Login,
+				false,
+				model.userIdentity,
+			);
 
 			// Abort request as unauthorized
 			throw new UnauthorizedError('Invalid credentials');
@@ -69,32 +95,9 @@ export class AuthenticationService implements IAuthenticationService {
 		);
 
 		if (!validatedChallengeToken.valid) {
-			// TODO: Store failed attempt
-			//this.loginAttemptService.createAttempt(false, model.email);
-
 			// Abort request as unauthorized
 			throw new UnauthorizedError(
 				`Invalid challenge token, reason: ${validatedChallengeToken.reason}`,
-			);
-		}
-
-		// Check if attempts have been exceeded
-		const attempsExceeded = await this.loginAttemptsExceeded(
-			authenticatedUser,
-		);
-
-		if (attempsExceeded) {
-			const windowMinutes =
-				this.config.auth.loginTimeWindowMS / 1000 / 60;
-
-			this.logger.warn(
-				'Blocked login request due to too many failed login attempts',
-				authenticatedUser.email,
-			);
-
-			throw new TooManyRequestsError(
-				`Too many failed login requests. Try again in ${windowMinutes} minutes`,
-				windowMinutes * 60,
 			);
 		}
 
@@ -120,6 +123,13 @@ export class AuthenticationService implements IAuthenticationService {
 			await loginUnit.users.update(authenticatedUser);
 
 			await loginUnit.commit();
+
+			// Store successful login attempt
+			await this.loginAttemptService.createAttempt(
+				LoginAttemptType.Login,
+				true,
+				authenticatedUser.email,
+			);
 
 			this.logger.info(
 				`Logged in user: ${authenticatedUser.email}`,
@@ -289,29 +299,6 @@ export class AuthenticationService implements IAuthenticationService {
 		}
 
 		return user;
-	}
-
-	/**
-	 * Checks if the max amount of failed login attempts have been exceeded by the given user
-	 * @param user User for which the login attempts shall be checked
-	 * @returns Boolean if the max attempts have been exceeded
-	 */
-	async loginAttemptsExceeded(user: User): Promise<boolean> {
-		const attemptUnit = this.uowFactory.create(false);
-		await attemptUnit.begin();
-
-		// Calculate timestamp for time window
-		const unix = new Date().valueOf();
-		const timelimit = new Date(unix - this.config.auth.loginTimeWindowMS);
-
-		const failedAttempts = await attemptUnit.loginAttempts.getAllFailedFromUserSince(
-			user,
-			timelimit,
-		);
-
-		await attemptUnit.commit();
-
-		return failedAttempts.length >= this.config.auth.maxFailedLoginAttempts;
 	}
 
 	/**

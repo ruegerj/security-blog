@@ -34,13 +34,6 @@ export interface IAuthenticationService {
 	getAuthenticatedUser(credentials: ICredentials): Promise<User>;
 
 	/**
-	 * Should check if the max amount of failed login attempts have been exceeded by the given user
-	 * @param user User for which the login attempts shall be checked
-	 * @returns Boolean if the max attempts have been exceeded
-	 */
-	loginAttemptsExceeded(user: User): Promise<boolean>;
-
-	/**
 	 * Should sign up a new user according to the provided data
 	 * @param model Dto containing the nescessary data for creating a new user
 	 * @returns Id of the created user
