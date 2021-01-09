@@ -31,5 +31,31 @@
 				</ng-template>
 			</li>
 		</ul>
+
+		<div *auth>
+			<span>
+				<mdb-icon
+					class="text-primary"
+					far
+					icon="user-circle"
+				></mdb-icon>
+				<ng-container *ngIf="authenticatedUser$ | async as user">
+					{{ user.username }}
+				</ng-container>
+			</span>
+			<button
+				mdbBtn
+				size="md"
+				[rounded]="true"
+				mdbTooltip="Logout"
+				(click)="logout()"
+			>
+				<mdb-icon
+					class="text-primary"
+					fas
+					icon="sign-out-alt"
+				></mdb-icon>
+			</button>
+		</div>
 	</links>
 </mdb-navbar>
