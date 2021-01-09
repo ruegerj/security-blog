@@ -2,7 +2,9 @@ import {
 	IsDefined,
 	IsEmail,
 	IsPhoneNumber,
+	IsString,
 	Matches,
+	MaxLength,
 	MinLength,
 } from 'class-validator';
 import { IsSwissMobileNumber } from './validators/phone.validator';
@@ -32,10 +34,30 @@ const specialCharRegexp = /[~!@#$%^&*_\-+=`\-|\\(){}\[\]:;"'<>,.?/]{1,}/;
  */
 export class SignUpDto {
 	/**
+	 * Username of the new user
+	 */
+	@IsDefined({
+		message: 'The username cannot be emtpy or missing',
+	})
+	@IsString({
+		message: 'The email must be a string value',
+	})
+	@MinLength(3, {
+		message: 'The username must be atleast 3 characters long',
+	})
+	@MaxLength(15, {
+		message: 'The username cannot be longer than 15 characters',
+	})
+	username: string;
+
+	/**
 	 * EMail address of the new user
 	 */
 	@IsDefined({
 		message: 'The email cannot be emtpy or missing',
+	})
+	@IsString({
+		message: 'The email must be a string value',
 	})
 	@IsEmail(undefined, {
 		message: 'The email must be an valid email address',
@@ -48,6 +70,9 @@ export class SignUpDto {
 	@IsDefined({
 		message: 'The phone number cannot be emtpy or missing',
 	})
+	@IsString({
+		message: 'The phone number must be a string value',
+	})
 	@IsPhoneNumber('CH', {
 		message: 'The phone number must be a valid swiss phone number',
 	})
@@ -59,6 +84,9 @@ export class SignUpDto {
 	 */
 	@IsDefined({
 		message: 'The password cannot be emtpy or missing',
+	})
+	@IsString({
+		message: 'The password must be a string value',
 	})
 	@MinLength(10, {
 		message: 'The password must be atleast 10 characters long',

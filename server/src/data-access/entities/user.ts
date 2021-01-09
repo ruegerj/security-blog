@@ -25,17 +25,30 @@ export class User implements IEntity {
 	id: string;
 
 	/**
+	 * Username of the user
+	 */
+	@Index({ unique: true })
+	@Column('text', {
+		unique: true,
+	})
+	username: string;
+
+	/**
 	 * Email of the user
 	 */
-	@Index()
-	@Column('text')
+	@Index({ unique: true })
+	@Column('text', {
+		unique: true,
+	})
 	email: string;
 
 	/**
 	 * Phone number of the user
 	 */
-	@Index()
-	@Column('text')
+	@Index({ unique: true })
+	@Column('text', {
+		unique: true,
+	})
 	phone: string;
 
 	/**

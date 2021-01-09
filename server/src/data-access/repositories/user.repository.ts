@@ -9,6 +9,17 @@ export class UserRepository
 	extends RepositoryBase<User>
 	implements IUserRepository {
 	/**
+	 * Checks if the given username already exists on one of the users
+	 * @param username Username to check
+	 * @returns Boolean if the username exists
+	 */
+	async usernameExists(username: string): Promise<boolean> {
+		const foundUser = await this.repository.findOne({ username });
+
+		return foundUser !== undefined;
+	}
+
+	/**
 	 * Checks if the given email already exists on one of the users
 	 * @param email Email address to check
 	 * @returns Boolean if the email exists

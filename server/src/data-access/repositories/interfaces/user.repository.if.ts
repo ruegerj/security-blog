@@ -6,6 +6,13 @@ import { User } from '../../entities/user';
  */
 export interface IUserRepository extends IRepository<User> {
 	/**
+	 * Should check if the given username already exists on one of the users
+	 * @param username Username to check
+	 * @returns Boolean if the username exists
+	 */
+	usernameExists(username: string): Promise<boolean>;
+
+	/**
 	 * Should check if the given email already exists on one of the users
 	 * @param email Email address to check
 	 * @returns Boolean if the email exists

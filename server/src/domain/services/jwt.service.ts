@@ -38,6 +38,7 @@ export class JwtService implements ITokenService {
 	async issueAccessToken(user: UserDto, roles: RoleDto[]): Promise<string> {
 		const claims: Record<string, unknown> = {
 			sub: user.id,
+			username: user.username,
 			email: user.email,
 			phone: user.phone,
 			roles: roles.map((r) => r.name),

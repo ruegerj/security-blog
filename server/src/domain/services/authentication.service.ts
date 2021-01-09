@@ -312,39 +312,49 @@ export class AuthenticationService implements IAuthenticationService {
 
 		await signUpUserUnit.begin();
 
-		// If email already in use => return validation error
-		const emailExists = await signUpUserUnit.users.emailExists(model.email);
+		const [usernameExists, emailExists, phoneExists] = await Promise.all([
+			signUpUserUnit.users.usernameExists(model.username),
+			signUpUserUnit.users.emailExists(model.email),
+			signUpUserUnit.users.phoneExists(model.phone),
+		]);
 
+		const identiyErrors: Record<string, string[]> = {};
+
+		// Check if username is already in use
+		if (usernameExists) {
+			this.logger.warn(
+				'Sign up request for an already existing username',
+				model.username,
+			);
+
+			identiyErrors.username = ['The username is already in use'];
+		}
+
+		// Check if email is already in use
 		if (emailExists) {
-			await signUpUserUnit.rollback();
-
 			this.logger.warn(
 				'Sign up request for an already existing email',
 				model.email,
 			);
 
-			throw new ValidationFailedError({
-				errors: {
-					email: ['The email is already in use'],
-				},
-			});
+			identiyErrors.email = ['The email is already in use'];
 		}
 
-		// If phone nr already in use => return validation error
-		const phoneExists = await signUpUserUnit.users.phoneExists(model.phone);
-
 		if (phoneExists) {
-			await signUpUserUnit.rollback();
-
 			this.logger.warn(
 				'Sign up request for an already existing phone number',
 				model.phone,
 			);
 
+			identiyErrors.phone = ['The phone number is already in use'];
+		}
+
+		// User identity conflict is present (duplicate username, email or phone) => abort with validation error
+		if (Object.keys(identiyErrors).length > 0) {
+			await signUpUserUnit.rollback();
+
 			throw new ValidationFailedError({
-				errors: {
-					phone: ['The phone number is already in use'],
-				},
+				errors: identiyErrors,
 			});
 		}
 
@@ -356,10 +366,11 @@ export class AuthenticationService implements IAuthenticationService {
 			model.phone = model.phone.substr(1, model.phone.length);
 		}
 
-		// Replace any whitespaces
+		// Replace any whitespaces in phone nr
 		model.phone.replace(/\s+/g, '');
 
 		const user = new User();
+		user.username = model.username;
 		user.email = model.email;
 		user.password = passwordHash;
 		user.phone = model.phone;
