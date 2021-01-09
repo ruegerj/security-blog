@@ -38,6 +38,16 @@ export class ValidationErrorsComponent {
 			maxlength: `This field can't contain more than ${
 				validatorValue?.requiredLength || 'n/a'
 			} characters.`,
+			email: 'This field is not a valid email address.',
+			passwordMismatch: 'The password fields do not match.',
+			invalidPhoneNumber: 'This field is not a valid phone number.',
+			lowercaseChars:
+				'This field must contain atleast one lowercase character (a-z).',
+			uppercaseChars:
+				'This field must contain atleast one uppercase character (A-Z).',
+			digits: 'This field must contain atleast one digit (0-9).',
+			specialChars:
+				'This field must contain atleast one special character.',
 		};
 
 		return messageLookup[validatorName] || 'Invalid field.';
