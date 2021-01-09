@@ -10,6 +10,7 @@ import {
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { NGXLogger } from 'ngx-logger';
+import { ValidationErrors } from '@data/models';
 
 /**
  * Interceptor for handling failed requests or errors during the request
@@ -43,6 +44,13 @@ export class ErrorInterceptor implements HttpInterceptor {
 					// Use generic error message for sever errors
 					if (errorResponse.status >= 500) {
 						errorMessage = 'Something went wrong, try again later';
+					} else if (errorResponse.status === 422) {
+						// Extract body to expose validation erros, when validation has failed
+						const payload = errorResponse.error?.payload;
+
+						return throwError(
+							new ValidationErrors(payload?.errors),
+						);
 					} else {
 						// Try extract message from error response or take status text
 						errorMessage =

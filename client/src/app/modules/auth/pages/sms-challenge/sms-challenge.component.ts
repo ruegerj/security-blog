@@ -40,7 +40,15 @@ export class SmsChallengeComponent implements OnInit {
 	ngOnInit(): void {}
 
 	verifySms(): void {
+		// Abort if form invalid
+		if (!this.smsVerifyForm.valid) {
+			return;
+		}
+
 		this.verifyingSms = true;
+
+		// Clear existing alerts
+		this.alertService.clear(this.alertId);
 
 		const code = this.smsCodeControl?.value;
 

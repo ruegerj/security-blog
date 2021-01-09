@@ -5,11 +5,11 @@ import { NGXLogger } from 'ngx-logger';
 import { Observable, throwError } from 'rxjs';
 import { map, switchMap, take } from 'rxjs/operators';
 import { ChallengeType } from '@data/enums';
-import { AccessToken, ChallengeToken, Credentials, User } from '@data/models';
-import { Challenge } from '@data/models/challenge';
+import { AccessToken, Credentials, User } from '@data/models';
 import { AuthStore, CredentialsStore } from '@data/stores';
 import { AuthQuery, CredentialsQuery } from '@data/queries';
 import { JwtService } from './jwt.service';
+import { SignUpUser } from '@data/models/signUpUser';
 
 /**
  * Service which handles all authentication related operations
@@ -123,6 +123,16 @@ export class AuthenticationService {
 				);
 			}),
 		);
+	}
+
+	/**
+	 * Attempts to register the provided user
+	 * @param user User which should be registered
+	 */
+	register(user: SignUpUser): Observable<void> {
+		const requestUrl = `${environment.apiBasePath}/auth/sign-up`;
+
+		return this.httpClient.post<void>(requestUrl, user);
 	}
 
 	/**

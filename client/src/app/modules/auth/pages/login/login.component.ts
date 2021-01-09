@@ -37,6 +37,11 @@ export class LoginComponent implements OnInit {
 	ngOnInit(): void {}
 
 	login(): void {
+		// Abort if form invalid
+		if (!this.loginForm.valid) {
+			return;
+		}
+
 		const credentials: Credentials = {
 			userIdentity: this.userIdentity?.value,
 			password: this.passwordControl?.value,

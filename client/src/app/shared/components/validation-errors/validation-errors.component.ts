@@ -48,6 +48,7 @@ export class ValidationErrorsComponent {
 			digits: 'This field must contain atleast one digit (0-9).',
 			specialChars:
 				'This field must contain atleast one special character.',
+			inUse: 'This value is already in use, choose a different one.',
 		};
 
 		return messageLookup[validatorName] || 'Invalid field.';
