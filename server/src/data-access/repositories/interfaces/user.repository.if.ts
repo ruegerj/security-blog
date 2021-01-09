@@ -41,6 +41,13 @@ export interface IUserRepository extends IRepository<User> {
 	getByIdWithRoles(id: string): Promise<User>;
 
 	/**
+	 * Should return the user with the provided username, including its roles
+	 * @param username Username of the requested user
+	 * @returns Found user or null
+	 */
+	getByUsernameWithRoles(username: string): Promise<User>;
+
+	/**
 	 * Should return the user with the corresponding email including its roles
 	 * @param email Email for which the user should be found for
 	 * @returns Found user or null

@@ -38,7 +38,7 @@ export class LoginComponent implements OnInit {
 
 	login(): void {
 		const credentials: Credentials = {
-			email: this.emailControl?.value,
+			userIdentity: this.userIdentity?.value,
 			password: this.passwordControl?.value,
 		};
 
@@ -79,8 +79,8 @@ export class LoginComponent implements OnInit {
 			});
 	}
 
-	get emailControl() {
-		return this.loginForm.get('email') as FormControl;
+	get userIdentity() {
+		return this.loginForm.get('userIdentity') as FormControl;
 	}
 
 	get passwordControl() {
@@ -89,7 +89,7 @@ export class LoginComponent implements OnInit {
 
 	private createLoginForm(): FormGroup {
 		return this.formBuilder.group({
-			email: ['', Validators.required],
+			userIdentity: ['', Validators.required],
 			password: ['', Validators.required],
 		});
 	}

@@ -39,7 +39,7 @@ export class ChallengeService {
 				}
 
 				const requestData = {
-					email: credentials.email,
+					userIdentity: credentials.userIdentity,
 					password: credentials.password,
 					type: ChallengeType.SMS,
 				};
@@ -75,7 +75,7 @@ export class ChallengeService {
 				}
 
 				const requestData = {
-					email: credentials.email,
+					userIdentity: credentials.userIdentity,
 					password: credentials.password,
 					challengeId: this.challengeId,
 					type: ChallengeType.SMS,

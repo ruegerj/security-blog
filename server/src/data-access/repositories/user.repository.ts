@@ -65,6 +65,18 @@ export class UserRepository
 	}
 
 	/**
+	 * Returns the user with the provided username, including its roles
+	 * @param username Username of the requested user
+	 * @returns Found user or null
+	 */
+	getByUsernameWithRoles(username: string): Promise<User> {
+		return this.repository.findOne({
+			relations: ['roles'],
+			where: { username },
+		});
+	}
+
+	/**
 	 * Returns the user with the corresponding email
 	 * @param email Email for which the user should be found for
 	 * @returns Found user or null

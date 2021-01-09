@@ -3,9 +3,9 @@
  */
 export interface ICredentials {
 	/**
-	 * Email of the user
+	 * Email or username of the user
 	 */
-	email: string;
+	userIdentity: string;
 
 	/**
 	 * Plain text password of the user

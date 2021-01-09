@@ -251,13 +251,25 @@ export class AuthenticationService implements IAuthenticationService {
 	 * @returns User if credentials valid, else null
 	 */
 	async getAuthenticatedUser(credentials: ICredentials): Promise<User> {
+		// Credits: https://stackoverflow.com/a/46181
+		const emailRegexp = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+
 		const validateUnit = this.uowFactory.create(false);
 		await validateUnit.begin();
 
-		// Get user by email, validate password
-		const user = await validateUnit.users.getByEmailWithRoles(
-			credentials.email,
-		);
+		let user: User;
+
+		// If matches => user identity is users email
+		if (credentials.userIdentity.match(emailRegexp)) {
+			user = await validateUnit.users.getByEmailWithRoles(
+				credentials.userIdentity,
+			);
+		} else {
+			// User identity is the username
+			user = await validateUnit.users.getByUsernameWithRoles(
+				credentials.userIdentity,
+			);
+		}
 
 		if (!user) {
 			await validateUnit.rollback();

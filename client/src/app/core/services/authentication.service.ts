@@ -49,7 +49,7 @@ export class AuthenticationService {
 				}
 
 				const requestData = {
-					email: credentials.email,
+					userIdentity: credentials.userIdentity,
 					password: credentials.password,
 				};
 

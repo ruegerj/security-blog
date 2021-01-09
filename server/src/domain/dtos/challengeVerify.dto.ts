@@ -7,15 +7,15 @@ import { ICredentials } from './interfaces';
  */
 export class ChallengeVerifyDto implements ICredentials {
 	/**
-	 * Email address of the user
+	 * Email address or username of the user
 	 */
 	@IsDefined({
-		message: 'The email cannot be emtpy or missing',
+		message: 'The user identity cannot be emtpy or missing',
 	})
 	@IsString({
-		message: 'The email must be a string',
+		message: 'The user identity must be a string',
 	})
-	email: string;
+	userIdentity: string;
 
 	/**
 	 * Plain text password of the user
