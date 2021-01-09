@@ -4,7 +4,7 @@
 >
 	<mdb-navbar-brand>
 		<span class="logo navbar-brand">
-			<mdb-icon fas icon="lock"></mdb-icon>
+			<mdb-icon class="text-primary" fas icon="lock"></mdb-icon>
 			Security Blog
 		</span>
 	</mdb-navbar-brand>
@@ -12,12 +12,23 @@
 		<ul class="navbar-nav mr-auto">
 			<li *ngFor="let item of navItems" class="nav-item">
 				<a
+					*ngIf="!item.authenticated; else authenticatedLink"
 					class="nav-link"
 					[routerLink]="item.link"
 					routerLinkActive="active"
 				>
 					{{ item.title }}
 				</a>
+				<ng-template #authenticatedLink>
+					<a
+						*auth="item?.roles || []"
+						class="nav-link"
+						[routerLink]="item.link"
+						routerLinkActive="active"
+					>
+						{{ item.title }}
+					</a>
+				</ng-template>
 			</li>
 		</ul>
 	</links>

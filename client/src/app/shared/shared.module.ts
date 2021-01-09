@@ -5,9 +5,10 @@ import { RouterModule } from '@angular/router';
 import { MDBBootstrapModule } from 'angular-bootstrap-md';
 import { ValidationErrorsComponent } from './components/validation-errors/validation-errors.component';
 import { AlertComponent } from './components/alert/alert.component';
+import { AuthDirective } from './directives/auth.directive';
 
 @NgModule({
-	declarations: [ValidationErrorsComponent, AlertComponent],
+	declarations: [ValidationErrorsComponent, AlertComponent, AuthDirective],
 	imports: [
 		CommonModule,
 		FormsModule,
@@ -26,6 +27,8 @@ import { AlertComponent } from './components/alert/alert.component';
 		// Shared components
 		ValidationErrorsComponent,
 		AlertComponent,
+		// Shared directives
+		AuthDirective,
 	],
 })
 export class SharedModule {}

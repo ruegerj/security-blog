@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { Role } from '@data/enums';
 
 @Component({
 	selector: 'app-nav',
@@ -10,6 +11,19 @@ export class NavComponent implements OnInit {
 		{
 			title: 'Home',
 			link: '/home',
+			authenticated: false,
+		},
+		{
+			title: 'User Dashboard',
+			link: '/user/dashboard',
+			authenticated: true,
+			roles: [Role.User],
+		},
+		{
+			title: 'Admin Dashboard',
+			link: '/admin/dashboard',
+			authenticated: true,
+			roles: [Role.Admin],
 		},
 	];
 
@@ -24,4 +38,6 @@ export class NavComponent implements OnInit {
 interface NavItem {
 	title: string;
 	link: string;
+	authenticated: boolean;
+	roles?: Role[];
 }
