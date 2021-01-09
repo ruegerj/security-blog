@@ -2,8 +2,8 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from '@env';
 import { NGXLogger } from 'ngx-logger';
-import { Observable, throwError } from 'rxjs';
-import { map, switchMap, take } from 'rxjs/operators';
+import { Observable, of, throwError } from 'rxjs';
+import { catchError, map, switchMap, take } from 'rxjs/operators';
 import { ChallengeType } from '@data/enums';
 import { AccessToken, Credentials, User } from '@data/models';
 import { AuthStore, CredentialsStore } from '@data/stores';
@@ -85,8 +85,8 @@ export class AuthenticationService {
 	/**
 	 * Attempts to refresh the current access token using the refresh token
 	 */
-	refreshToken(): Observable<void> {
-		const requestUrl = `${environment}/auth/refresh`;
+	refreshToken(): Observable<User | null> {
+		const requestUrl = `${environment.apiBasePath}/auth/refresh`;
 
 		return this.httpClient.post<AccessToken>(requestUrl, undefined).pipe(
 			map((response) => {
@@ -95,6 +95,13 @@ export class AuthenticationService {
 				this.logger.info(
 					`Successfuly refreshed token for: ${authenticatedUser.email}`,
 				);
+
+				return authenticatedUser;
+			}),
+			catchError((err) => {
+				this.logger.error('Failed to refresh access token', err);
+
+				return of(null);
 			}),
 		);
 	}

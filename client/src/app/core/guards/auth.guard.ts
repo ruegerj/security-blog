@@ -5,9 +5,10 @@ import {
 	RouterStateSnapshot,
 	Router,
 } from '@angular/router';
+import { AuthenticationService } from '@app/services';
 import { AuthQuery } from '@data/queries';
 import { Observable, of, forkJoin } from 'rxjs';
-import { switchMap, take } from 'rxjs/operators';
+import { catchError, map, switchMap, take } from 'rxjs/operators';
 
 /**
  * Guard which requires the user to be authenticated (Authentication) and if specified to have specific roles (Authorization)
@@ -16,25 +17,33 @@ import { switchMap, take } from 'rxjs/operators';
 	providedIn: 'root',
 })
 export class AuthGuard implements CanActivate {
-	constructor(private router: Router, private authQuery: AuthQuery) {}
+	constructor(
+		private router: Router,
+		private authQuery: AuthQuery,
+		private authenticationService: AuthenticationService,
+	) {}
 
 	canActivate(
 		route: ActivatedRouteSnapshot,
 		state: RouterStateSnapshot,
 	): Observable<boolean> {
-		return forkJoin({
-			isLoggedIn: this.authQuery.isLoggedIn$.pipe(take(1)),
-			authenticatedUser: this.authQuery.authenticatedUser$.pipe(take(1)),
-		}).pipe(
-			switchMap(({ isLoggedIn, authenticatedUser }) => {
-				// If not logged in or dont exists => redirect to /login
-				if (!isLoggedIn || !authenticatedUser) {
+		return this.authQuery.isLoggedIn$.pipe(
+			switchMap((isLoggedIn) => {
+				// Not logged in => attempt token refresh
+				if (!isLoggedIn) {
+					return this.authenticationService.refreshToken();
+				}
+
+				return this.authQuery.authenticatedUser$;
+			}),
+			switchMap((authenticatedUser) => {
+				// No user in store or token refresh failed => redirect to login, deny route access
+				if (!authenticatedUser) {
 					this.router.navigate(['/login'], {
 						queryParams: {
 							redirectUrl: state.url,
 						},
 					});
-
 					return of(false);
 				}
 
@@ -49,7 +58,7 @@ export class AuthGuard implements CanActivate {
 					return of(false);
 				}
 
-				// Everything seems fine => grant activation
+				// Everything seems fine => grant route access
 				return of(true);
 			}),
 		);
