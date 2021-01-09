@@ -312,6 +312,14 @@ export class AuthenticationService implements IAuthenticationService {
 
 		await signUpUserUnit.begin();
 
+		// Trim "0" prefix if exists on phone nr
+		if (model.phone.startsWith('0')) {
+			model.phone = model.phone.substr(1, model.phone.length);
+		}
+
+		// Replace any whitespaces in phone nr
+		model.phone = model.phone.replace(/\s+/g, '');
+
 		const [usernameExists, emailExists, phoneExists] = await Promise.all([
 			signUpUserUnit.users.usernameExists(model.username),
 			signUpUserUnit.users.emailExists(model.email),
@@ -360,14 +368,6 @@ export class AuthenticationService implements IAuthenticationService {
 
 		// Everything is fine => create actual user
 		const passwordHash = await this.hashingService.create(model.password);
-
-		// Trim "0" prefix if exists on phone nr
-		if (model.phone.startsWith('0')) {
-			model.phone = model.phone.substr(1, model.phone.length);
-		}
-
-		// Replace any whitespaces in phone nr
-		model.phone.replace(/\s+/g, '');
 
 		const user = new User();
 		user.username = model.username;
