@@ -93,6 +93,12 @@ export class SmsChallengeComponent implements OnInit {
 					return;
 				}
 
+				// Create success alert
+				this.alertService.success('Successfully logged in', {
+					autoClose: true,
+					keepAfterRouteChange: true,
+				});
+
 				let routeFragments: string[] = [];
 
 				// Navigate to the corresponding dashboard based uppon the users roles
@@ -104,7 +110,7 @@ export class SmsChallengeComponent implements OnInit {
 					routeFragments = ['/'];
 				}
 
-				return this.router.navigate(routeFragments);
+				this.router.navigate(routeFragments);
 			});
 	}
 

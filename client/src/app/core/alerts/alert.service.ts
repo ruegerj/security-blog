@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Observable, Subject } from 'rxjs';
+import { Observable, ReplaySubject, Subject } from 'rxjs';
 import { filter } from 'rxjs/operators';
 import { Alert } from './alert';
 import { AlertType } from './alertType.enum';
@@ -13,7 +13,7 @@ import { AlertType } from './alertType.enum';
 	providedIn: 'root',
 })
 export class AlertService {
-	private subject = new Subject<Alert>();
+	private subject = new ReplaySubject<Alert>();
 
 	/**
 	 * Default id which is used for the alerts, when nothing different specified
