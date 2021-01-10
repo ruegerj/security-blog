@@ -64,19 +64,17 @@ export class AuthDirective implements OnInit, OnDestroy {
 	ngOnInit(): void {
 		this.userSubscription = this.authQuery.authenticatedUser$.subscribe(
 			(authenticatedUser) => {
+				// Clear template e.g. remove from DOM
+				this.viewContainer.clear();
+
 				// If user authenticated and satifies role claims => render template
 				if (authenticatedUser && this.isInRole(authenticatedUser)) {
 					this.viewContainer.createEmbeddedView(this.templateRef);
 					return;
 				} else if (this.elseTemplate) {
 					// Render "else" tempalte
-					this.viewContainer.clear();
 					this.viewContainer.createEmbeddedView(this.elseTemplate);
-					return;
 				}
-
-				// Clear template e.g. remove from DOM
-				this.viewContainer.clear();
 			},
 		);
 	}

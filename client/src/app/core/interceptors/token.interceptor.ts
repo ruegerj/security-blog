@@ -46,8 +46,6 @@ export class TokenInterceptor implements HttpInterceptor {
 			return next.handle(request);
 		}
 
-		console.log('process', request.url);
-
 		// Queue request when refresh ongoing
 		if (this.refreshOngoing) {
 			return this.credentialsQuery.token$.pipe(
@@ -64,8 +62,6 @@ export class TokenInterceptor implements HttpInterceptor {
 		return this.credentialsQuery.validTokenSet$.pipe(
 			take(1),
 			switchMap((validTokenSet) => {
-				console.log('Valid token', validTokenSet);
-
 				if (!validTokenSet) {
 					return this.authenticationService
 						.refreshToken()
@@ -76,8 +72,6 @@ export class TokenInterceptor implements HttpInterceptor {
 			}),
 			take(1),
 			switchMap((token) => {
-				console.log('set token', token);
-
 				return next.handle(this.injectToken(request, token || ''));
 			}),
 		);
@@ -108,12 +102,6 @@ export class TokenInterceptor implements HttpInterceptor {
 		if (!request.url.startsWith(environment.apiBasePath)) {
 			return true;
 		}
-
-		console.log(
-			'Checking request',
-			request.url,
-			this.ignoredUrls.some((ignored) => request.url === ignored),
-		);
 
 		return this.ignoredUrls.some((ignored) => request.url === ignored);
 	}
