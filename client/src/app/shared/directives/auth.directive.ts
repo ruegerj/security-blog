@@ -43,14 +43,14 @@ export class AuthDirective implements OnInit, OnDestroy {
 	 * Optional roles which should be checked => atleast one role must be satisfied by the current user
 	 */
 	@Input()
-	set auth(roles: Role[] | string) {
+	set auth(roles: string[] | string) {
 		// No param provided => set to default
 		if (typeof roles === 'string') {
 			this.roles = [];
 			return;
 		}
 
-		this.roles = roles;
+		this.roles = roles as Role[];
 	}
 
 	/**
