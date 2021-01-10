@@ -23,7 +23,11 @@ import { WinstonLogger } from '@infrastructure/logger/winstonLogger';
 import * as dataAccess from '@data-access/configure';
 import * as domain from '@domain/configure';
 import { ILogger } from '@infrastructure/logger/interfaces';
-import { AuthenticationController, ChallengeController } from './controllers';
+import {
+	AuthenticationController,
+	ChallengeController,
+	PostController,
+} from './controllers';
 import { NotFoundError } from '@infrastructure/errors';
 
 export class App {
@@ -102,7 +106,11 @@ export class App {
 		await domain.configure();
 
 		// Register all controller used by the application
-		Container.import([AuthenticationController, ChallengeController]);
+		Container.import([
+			AuthenticationController,
+			ChallengeController,
+			PostController,
+		]);
 	}
 
 	/**

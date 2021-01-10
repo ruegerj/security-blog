@@ -8,6 +8,7 @@ import {
 	IChallengeService,
 	IHashingService,
 	ILoginAttemptService,
+	IPostService,
 	ISmsService,
 	ITokenService,
 } from '@domain/services/interfaces';
@@ -22,6 +23,7 @@ export const Tokens = {
 	ControllerBase: new Token<ControllerBase>(),
 	// Domain
 	IAuthenticationService: new Token<IAuthenticationService>(),
+	IPostService: new Token<IPostService>(),
 	ILoginAttemptService: new Token<ILoginAttemptService>(),
 	IChallengeService: new Token<IChallengeService>(),
 	IHashingService: new Token<IHashingService>(),

@@ -21,6 +21,18 @@ export class Post implements IEntity {
 	id: string;
 
 	/**
+	 * Title of the post
+	 */
+	@Column('text')
+	title: string;
+
+	/**
+	 * Timestamp when the post was created
+	 */
+	@Column('integer')
+	createdAt: Date;
+
+	/**
 	 * Content / Text of the post
 	 */
 	@Column('text')
@@ -31,7 +43,7 @@ export class Post implements IEntity {
 	 */
 	@Index()
 	@Column('integer')
-	status: PostType;
+	status: PostState;
 
 	/**
 	 * Author of this post
@@ -53,19 +65,19 @@ export class Post implements IEntity {
 /**
  * Defines all possible states a post can have
  */
-export enum PostType {
+export enum PostState {
 	/**
 	 * The post is published and visible for all users
 	 */
-	Published,
+	Published = 1,
 
 	/**
 	 * The post is hidden and only visible for the author and admins
 	 */
-	Hidden,
+	Hidden = 2,
 
 	/**
 	 * The post is deleted and won't be shown on ui
 	 */
-	Deleted,
+	Deleted = 3,
 }
