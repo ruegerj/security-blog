@@ -15,7 +15,12 @@
 				</h4>
 			</mdb-card-title>
 			<mdb-card-text>
-				<h6>
+				<h6
+					[mdbTooltip]="
+						(post.createdAt | date: 'dd. MMM yyyy h:mm a') || ''
+					"
+					placement="right"
+				>
 					<mdb-icon
 						class="text-primary"
 						far
