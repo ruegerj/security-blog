@@ -9,3 +9,4 @@ export * from './challengeRequest.dto';
 export * from './challengeVerify.dto';
 export * from './postSummary.dto';
 export * from './authorSummary.dto';
+export * from './createPost.dto';

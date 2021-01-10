@@ -1,6 +1,13 @@
+import { CreatePostDto } from '@domain/dtos';
 import { PostState } from '@domain/dtos/enums';
-import { IPostService } from '@domain/services/interfaces';
+import { IPostService, ITokenService } from '@domain/services/interfaces';
 import { Tokens } from '@infrastructure/ioc';
+import { ILogger } from '@infrastructure/logger/interfaces';
+import {
+	authenticate,
+	IAuthenticatedUserLocals,
+	validate,
+} from '@infrastructure/middleware';
 import { SuccessResponse } from '@infrastructure/responses';
 import { Request, Response } from 'express';
 import { Inject, Service } from 'typedi';
@@ -16,6 +23,12 @@ export class PostController extends ControllerBase {
 	constructor(
 		@Inject(Tokens.IPostService)
 		private postService: IPostService,
+
+		@Inject(Tokens.ITokenService)
+		private tokenService: ITokenService,
+
+		@Inject(Tokens.ILogger)
+		private logger: ILogger,
 	) {
 		super();
 	}
@@ -31,7 +44,32 @@ export class PostController extends ControllerBase {
 		res.status(200).json(new SuccessResponse().withPayload(posts));
 	}
 
+	/**
+	 * Endpoint for creating new posts
+	 */
+	async createPost(req: Request, res: Response): Promise<void> {
+		const { user } = res.locals as IAuthenticatedUserLocals;
+
+		const postModel = req.body as CreatePostDto;
+		postModel.authorId = user.id;
+
+		const postId = await this.postService.create(postModel);
+
+		res.status(201).json(
+			new SuccessResponse().withPayload({
+				id: postId,
+			}),
+		);
+	}
+
 	initializeRoutes(): void {
-		this.router.get('/', this.catch(this.getPublishedPosts, this));
+		this.router
+			.route('/')
+			.get(this.catch(this.getPublishedPosts, this))
+			.post(
+				authenticate(this.tokenService, this.logger),
+				validate(CreatePostDto),
+				this.catch(this.createPost, this),
+			);
 	}
 }
