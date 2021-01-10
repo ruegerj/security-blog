@@ -110,7 +110,7 @@ export class AuthenticationService {
 	 * Logs the current user out and updates the affected stores accordingly
 	 */
 	logout(): Observable<void> {
-		const requestUrl = `${environment}/auth/logout`;
+		const requestUrl = `${environment.apiBasePath}/auth/logout`;
 
 		return this.authQuery.isLoggedIn$.pipe(
 			take(1),

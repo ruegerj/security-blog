@@ -7,8 +7,8 @@ import {
 } from '@angular/router';
 import { AuthenticationService } from '@app/services';
 import { AuthQuery } from '@data/queries';
-import { Observable, of, forkJoin } from 'rxjs';
-import { catchError, map, switchMap, take } from 'rxjs/operators';
+import { Observable, of } from 'rxjs';
+import { switchMap } from 'rxjs/operators';
 
 /**
  * Guard which requires the user to be authenticated (Authentication) and if specified to have specific roles (Authorization)

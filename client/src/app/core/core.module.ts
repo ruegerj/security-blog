@@ -13,6 +13,7 @@ import {
 	ErrorInterceptorProvider,
 	LoggingInterceptorProvider,
 	ParseBodyInterceptorProvider,
+	TokenInterceptorProvider,
 } from './interceptors';
 
 @NgModule({
@@ -37,6 +38,7 @@ import {
 		LoggingInterceptorProvider,
 		ErrorInterceptorProvider,
 		ParseBodyInterceptorProvider,
+		TokenInterceptorProvider,
 	],
 	exports: [],
 })
