@@ -1,0 +1,46 @@
+<mdb-card>
+	<mdb-card-body>
+		<mdb-card-title>
+			<h2>Write Post</h2>
+		</mdb-card-title>
+
+		<app-alert [alertId]="alertId" [fade]="true"></app-alert>
+
+		<form (ngSubmit)="createPost()" [formGroup]="newPostForm">
+			<div class="form-group">
+				<label for="titleInput">Title</label>
+				<input
+					class="form-control"
+					type="text"
+					id="titleInput"
+					formControlName="title"
+				/>
+				<app-validation-errors
+					[control]="titleControl"
+				></app-validation-errors>
+			</div>
+
+			<div class="form-group">
+				<label for="contentInput">Post Content</label>
+				<ckeditor
+					id="contentInput"
+					[editor]="editor"
+					[config]="config"
+					formControlName="content"
+				></ckeditor>
+				<app-validation-errors [control]="contentControl">
+				</app-validation-errors>
+			</div>
+
+			<button
+				type="submit"
+				mdbBtn
+				color="primary"
+				[disabled]="newPostForm.invalid || creating"
+			>
+				<mdb-icon class="mr-1" fas icon="plus"></mdb-icon>
+				Create
+			</button>
+		</form>
+	</mdb-card-body>
+</mdb-card>

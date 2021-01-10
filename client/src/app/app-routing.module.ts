@@ -18,6 +18,12 @@ const routes: Routes = [
 			import('@modules/home/home.module').then((m) => m.HomeModule),
 	},
 	{
+		path: 'post',
+		component: ContentLayoutComponent,
+		loadChildren: () =>
+			import('@modules/post/post.module').then((m) => m.PostModule),
+	},
+	{
 		path: '',
 		component: AuthLayoutComponent,
 		canActivateChild: [NoAuthGuard],

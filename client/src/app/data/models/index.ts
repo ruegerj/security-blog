@@ -7,3 +7,4 @@ export * from './validationErrors';
 export * from './signUpUser';
 export * from './postSummary';
 export * from './authorSummary';
+export * from './createPost';

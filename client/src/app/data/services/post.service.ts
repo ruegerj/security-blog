@@ -1,10 +1,9 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { PostState } from '@data/enums';
-import { PostSummary } from '@data/models';
+import { CreatePost, PostSummary } from '@data/models';
+import { CreatedResponse } from '@data/models/createdResponse';
 import { environment } from '@env';
-import { Observable, of, timer } from 'rxjs';
-import { switchMap, switchMapTo } from 'rxjs/operators';
+import { Observable } from 'rxjs';
 
 /**
  * Service for handling post operations
@@ -22,5 +21,15 @@ export class PostService {
 		const requestUrl = `${environment.apiBasePath}/posts`;
 
 		return this.httpClient.get<PostSummary[]>(requestUrl);
+	}
+
+	/**
+	 * Creates a new post
+	 * @param post Post which should be created
+	 */
+	create(post: CreatePost): Observable<CreatedResponse> {
+		const requestUrl = `${environment.apiBasePath}/posts`;
+
+		return this.httpClient.post<CreatedResponse>(requestUrl, post);
 	}
 }
