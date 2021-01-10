@@ -53,46 +53,11 @@
 
 <ng-container *ngIf="posts$ | async as posts; else loading">
 	<div class="row mb-4 container-fluid" *ngFor="let post of posts">
-		<mdb-card class="w-100">
-			<mdb-card-body class="d-flex flex-row">
-				<div class="mr-auto">
-					<mdb-card-title>
-						<h4 class="mb-3">{{ post.title }}</h4>
-					</mdb-card-title>
-					<mdb-card-text>
-						<h6>
-							<mdb-icon
-								class="text-primary"
-								far
-								icon="calendar-alt"
-							></mdb-icon>
-							Published: {{ post.createdAt | dateAgo }}
-						</h6>
-						<h6>
-							<mdb-icon
-								class="text-primary"
-								far
-								icon="user-circle"
-							></mdb-icon>
-							Author: <i>{{ post.author.username }}</i>
-						</h6>
-					</mdb-card-text>
-				</div>
-
-				<div class="d-flex flex-column justify-content-center">
-					<button
-						mdbBtn
-						color="primary"
-						[outline]="true"
-						[routerLink]="['posts', post.id]"
-						routerLinkActive="active"
-					>
-						<mdb-icon fas icon="book-open"></mdb-icon>
-						Read
-					</button>
-				</div>
-			</mdb-card-body>
-		</mdb-card>
+		<app-post-summary
+			[post]="post"
+			[showState]="false"
+			class="w-100"
+		></app-post-summary>
 	</div>
 </ng-container>
 

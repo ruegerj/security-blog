@@ -1,0 +1,50 @@
+<mdb-card>
+	<mdb-card-body class="d-flex flex-row">
+		<div class="mr-auto">
+			<mdb-card-title class="mb-3">
+				<h4>
+					{{ post.title }}
+					<small class="d-inline-block align-text-top">
+						<mdb-badge
+							*ngIf="showState"
+							[color]="lookUpColor(post.state)"
+						>
+							{{ lookUpTitle(post.state) }}
+						</mdb-badge>
+					</small>
+				</h4>
+			</mdb-card-title>
+			<mdb-card-text>
+				<h6>
+					<mdb-icon
+						class="text-primary"
+						far
+						icon="calendar-alt"
+					></mdb-icon>
+					Published: {{ post.createdAt | dateAgo }}
+				</h6>
+				<h6>
+					<mdb-icon
+						class="text-primary"
+						far
+						icon="user-circle"
+					></mdb-icon>
+					Author: <i>{{ post.author.username }}</i>
+				</h6>
+			</mdb-card-text>
+		</div>
+
+		<div class="d-flex flex-column justify-content-center">
+			<button
+				mdbBtn
+				color="primary"
+				[outline]="true"
+				[routerLink]="['posts', post.id]"
+				routerLinkActive="active"
+			>
+				<mdb-icon fas icon="book-open"></mdb-icon>
+				Read
+			</button>
+		</div>
+	</mdb-card-body>
+</mdb-card>

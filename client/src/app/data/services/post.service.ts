@@ -25,7 +25,7 @@ export class PostService {
 					{
 						id: '56442f60-a6ce-4355-bf81-a95705399a6f',
 						title: 'How to protect against XSS',
-						state: PostState.Published,
+						state: PostState.Deleted,
 						createdAt: new Date(1610283216132),
 						author: {
 							id: 'b345f781-3dc3-4f7a-8226-967be77575f2',
@@ -35,7 +35,7 @@ export class PostService {
 					{
 						id: '0a9e6774-4aac-4fa6-ac0c-e41a3e5de208',
 						title: 'CSRF vulnerabilities - an analysis',
-						state: PostState.Published,
+						state: PostState.Hidden,
 						createdAt: new Date(1610283216132),
 						author: {
 							id: '567a47c3-90aa-4197-87ec-c3a5e81372b3',
