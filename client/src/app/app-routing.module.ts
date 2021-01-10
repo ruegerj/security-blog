@@ -23,13 +23,20 @@ const routes: Routes = [
 						(m) => m.UserModule,
 					),
 			},
+			{
+				path: 'home',
+				loadChildren: () =>
+					import('@modules/home/home.module').then(
+						(m) => m.HomeModule,
+					),
+			},
+			// Fallback for unmatched routes
+			{
+				path: '**',
+				redirectTo: '/home',
+				pathMatch: 'full',
+			},
 		],
-	},
-	// Fallback for unmatched routes
-	{
-		path: '**',
-		redirectTo: '/',
-		pathMatch: 'full',
 	},
 ];
 

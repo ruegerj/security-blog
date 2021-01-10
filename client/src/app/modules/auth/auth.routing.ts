@@ -24,6 +24,12 @@ const routes: Routes = [
 		path: 'register',
 		component: RegisterComponent,
 	},
+	// Fallback for unmatched routes
+	{
+		path: '**',
+		redirectTo: '/home',
+		pathMatch: 'full',
+	},
 ];
 
 @NgModule({

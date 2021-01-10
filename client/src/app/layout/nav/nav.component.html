@@ -32,7 +32,7 @@
 			</li>
 		</ul>
 
-		<div *auth>
+		<div *auth="[]; else unauthenticated">
 			<span>
 				<mdb-icon
 					class="text-primary"
@@ -57,5 +57,24 @@
 				></mdb-icon>
 			</button>
 		</div>
+
+		<ng-template #unauthenticated>
+			<div>
+				<a
+					mdbBtn
+					size="md"
+					[rounded]="true"
+					[routerLink]="['/login']"
+					routerLinkActive="active"
+				>
+					<mdb-icon
+						class="text-primary mr-1"
+						fas
+						icon="sign-in-alt"
+					></mdb-icon>
+					Login
+				</a>
+			</div>
+		</ng-template>
 	</links>
 </mdb-navbar>
