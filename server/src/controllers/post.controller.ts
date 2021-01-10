@@ -1,6 +1,11 @@
 import { CreatePostDto } from '@domain/dtos';
-import { PostState } from '@domain/dtos/enums';
+import { PostState, Role } from '@domain/dtos/enums';
 import { IPostService, ITokenService } from '@domain/services/interfaces';
+import {
+	BadRequestError,
+	ForbiddenError,
+	NotFoundError,
+} from '@infrastructure/errors';
 import { Tokens } from '@infrastructure/ioc';
 import { ILogger } from '@infrastructure/logger/interfaces';
 import {
@@ -45,6 +50,41 @@ export class PostController extends ControllerBase {
 	}
 
 	/**
+	 * Endpoint for fetching a post by its id
+	 */
+	async getById(req: Request, res: Response): Promise<void> {
+		const postId = req.params.id;
+		const { user } = res.locals as IAuthenticatedUserLocals;
+
+		if (!postId) {
+			throw new BadRequestError('Missing post id');
+		}
+
+		const post = await this.postService.getById(postId);
+
+		if (!post) {
+			throw new NotFoundError('Could not find requested post');
+		}
+
+		// Check if user is allowed to see the post
+		if (
+			post.author.id != user.subject &&
+			post.state !== PostState.Published &&
+			!user.roles.includes(Role.Admin)
+		) {
+			this.logger.warn(
+				`Prohibited user: ${user.email} access to the post: ${post.id}`,
+				post.id,
+				user.id,
+			);
+
+			throw new ForbiddenError("Your aren't allowed to see this post");
+		}
+
+		res.status(200).json(new SuccessResponse().withPayload(post));
+	}
+
+	/**
 	 * Endpoint for creating new posts
 	 */
 	async createPost(req: Request, res: Response): Promise<void> {
@@ -70,6 +110,13 @@ export class PostController extends ControllerBase {
 				authenticate(this.tokenService, this.logger),
 				validate(CreatePostDto),
 				this.catch(this.createPost, this),
+			);
+
+		this.router
+			.route('/:id')
+			.get(
+				authenticate(this.tokenService, this.logger),
+				this.catch(this.getById, this),
 			);
 	}
 }

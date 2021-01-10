@@ -1,4 +1,4 @@
-import { CreatePostDto, PostSummaryDto } from '@domain/dtos';
+import { CreatePostDto, PostDetailDto, PostSummaryDto } from '@domain/dtos';
 import { PostState } from '@domain/dtos/enums';
 
 /**
@@ -10,6 +10,13 @@ export interface IPostService {
 	 * @param states States for which all corresponding posts should be fetched
 	 */
 	getSummariesByStates(states: PostState[]): Promise<PostSummaryDto[]>;
+
+	/**
+	 * Should return the detailed informations of the post with the given id
+	 * @param id Id of the requested post
+	 * @returns Found post or undefined
+	 */
+	getById(id: string): Promise<PostDetailDto | undefined>;
 
 	/**
 	 * Should create a new post based on the provided model

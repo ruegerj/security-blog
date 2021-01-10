@@ -10,4 +10,11 @@ export interface IPostRepository extends IRepository<Post> {
 	 * @param states Collection of states for which the posts should be fetched
 	 */
 	getByStatesWithAuthor(states: PostState[]): Promise<Post[]>;
+
+	/**
+	 * Should return the post with the given id, including its author
+	 * @param id Id of the requested post
+	 * @returns Found post or undefined
+	 */
+	getByIdWithAuthor(id: string): Promise<Post | undefined>;
 }

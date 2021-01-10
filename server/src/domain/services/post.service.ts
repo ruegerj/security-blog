@@ -1,7 +1,7 @@
 import { Post } from '@data-access/entities';
 import { IUnitOfWorkFactory } from '@data-access/uow/factory/interfaces';
 import { IUnitOfWork } from '@data-access/uow/interfaces';
-import { CreatePostDto, PostSummaryDto } from '@domain/dtos';
+import { CreatePostDto, PostDetailDto, PostSummaryDto } from '@domain/dtos';
 import { PostState } from '@domain/dtos/enums';
 import { BadRequestError } from '@infrastructure/errors';
 import { Tokens } from '@infrastructure/ioc';
@@ -46,6 +46,38 @@ export class PostService implements IPostService {
 				},
 			};
 		});
+	}
+
+	/**
+	 * Returns the detailed informations of the post with the given id
+	 * @param id Id of the requested post
+	 * @returns Found post or undefined
+	 */
+	async getById(id: string): Promise<PostDetailDto | undefined> {
+		const getByIdUnit = this.uowFactory.create(false);
+		await getByIdUnit.begin();
+
+		const post = await getByIdUnit.posts.getByIdWithAuthor(id);
+
+		if (!post) {
+			await getByIdUnit.rollback();
+
+			return undefined;
+		}
+
+		await getByIdUnit.commit();
+
+		return {
+			id: post.id,
+			title: post.title,
+			state: post.status,
+			createdAt: post.createdAt,
+			content: post.content,
+			author: {
+				id: post.author.id,
+				username: post.author.username,
+			},
+		};
 	}
 
 	/**

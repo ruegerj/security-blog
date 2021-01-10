@@ -22,4 +22,18 @@ export class PostRepository
 			},
 		});
 	}
+
+	/**
+	 * Returns the post with the given id, including its author
+	 * @param id Id of the requested post
+	 * @returns Found post or undefined
+	 */
+	getByIdWithAuthor(id: string): Promise<Post | undefined> {
+		return this.repository.findOne({
+			relations: ['author'],
+			where: {
+				id,
+			},
+		});
+	}
 }

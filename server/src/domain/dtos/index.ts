@@ -10,3 +10,4 @@ export * from './challengeVerify.dto';
 export * from './postSummary.dto';
 export * from './authorSummary.dto';
 export * from './createPost.dto';
+export * from './postDetail.dto';
