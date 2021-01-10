@@ -1,1 +1,110 @@
-<p>home works!</p>
+<div class="jumbotron text-center">
+	<mdb-icon class="text-primary" fas icon="lock"></mdb-icon>
+	<h2>Security Blog</h2>
+	<p class="text-primary my-4 font-weight-bold">
+		The hub for application security related articles
+	</p>
+	<div class="row justify-content-center">
+		<div class="col-xl-7 pb-2">
+			<p class="card-text">
+				Discover many articles related to web-security or application
+				security written by our great community.
+			</p>
+		</div>
+	</div>
+	<div *auth="[]; else unauthenticated"></div>
+
+	<ng-template #unauthenticated>
+		<hr class="my-4" />
+		<div class="pt-2 text-center">
+			<p>Interested in writing for us?</p>
+			<button
+				mdbBtn
+				color="primary"
+				class="mr-2"
+				[routerLink]="['/register']"
+				routerLinkActive="active"
+			>
+				<mdb-icon class="mr-1" fas icon="user-plus"></mdb-icon>
+				Register
+			</button>
+			<button
+				mdbBtn
+				color="primary"
+				class="ml-2"
+				[outline]="true"
+				[routerLink]="['/login']"
+				routerLinkActive="active"
+			>
+				<mdb-icon class="mr-1" fas icon="sign-in-alt"></mdb-icon>
+				Login
+			</button>
+		</div>
+	</ng-template>
+</div>
+
+<h2>
+	Latest Posts
+	<button mdbBtn size="md" class="mb-3" (click)="fetchPosts()">
+		<mdb-icon class="text-primary" fas icon="redo-alt"></mdb-icon>
+		Refresh
+	</button>
+</h2>
+
+<ng-container *ngIf="posts$ | async as posts; else loading">
+	<div class="row mb-4 container-fluid" *ngFor="let post of posts">
+		<mdb-card class="w-100">
+			<mdb-card-body class="d-flex flex-row">
+				<div class="mr-auto">
+					<mdb-card-title>
+						<h4 class="mb-3">{{ post.title }}</h4>
+					</mdb-card-title>
+					<mdb-card-text>
+						<h6>
+							<mdb-icon
+								class="text-primary"
+								far
+								icon="calendar-alt"
+							></mdb-icon>
+							Published: {{ post.createdAt | dateAgo }}
+						</h6>
+						<h6>
+							<mdb-icon
+								class="text-primary"
+								far
+								icon="user-circle"
+							></mdb-icon>
+							Author: <i>{{ post.author.username }}</i>
+						</h6>
+					</mdb-card-text>
+				</div>
+
+				<div class="d-flex flex-column justify-content-center">
+					<button
+						mdbBtn
+						color="primary"
+						[outline]="true"
+						[routerLink]="['posts', post.id]"
+						routerLinkActive="active"
+					>
+						<mdb-icon fas icon="book-open"></mdb-icon>
+						Read
+					</button>
+				</div>
+			</mdb-card-body>
+		</mdb-card>
+	</div>
+</ng-container>
+
+<ng-template #loading>
+	<div class="row w-100 flex-row justify-content-center">
+		<h1>
+			<mdb-icon
+				class="text-primary"
+				[classInside]="'fa-spin'"
+				fas
+				icon="spinner"
+			></mdb-icon>
+		</h1>
+	</div>
+</ng-template>

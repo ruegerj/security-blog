@@ -5,3 +5,5 @@ export * from './accessToken';
 export * from './user';
 export * from './validationErrors';
 export * from './signUpUser';
+export * from './postSummary';
+export * from './authorSummary';
