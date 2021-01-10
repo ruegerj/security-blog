@@ -1,4 +1,4 @@
-<div *ngFor="let alert of alerts" class="{{ buildAlertClass(alert) }}">
-	<a class="close" (click)="removeAlert(alert)">&times;</a>
+<div *ngFor="let alert of alerts" class="{{ buildAlertClass(alert) }} mb-2">
+	<a class="ml-2 close" (click)="removeAlert(alert)">&times;</a>
 	<span>{{ alert.message }}</span>
 </div>
