@@ -52,12 +52,25 @@ export class PostController extends ControllerBase {
 	}
 
 	/**
-	 * Endpoint for fetching all own post
+	 * Endpoint for fetching all own posts
 	 */
 	async getOwnPosts(req: Request, res: Response): Promise<void> {
 		const { user } = res.locals as IAuthenticatedUserLocals;
 
 		const posts = await this.postService.getSummariesByUserId(user.id);
+
+		res.status(200).json(new SuccessResponse().withPayload(posts));
+	}
+
+	/**
+	 * Endpoint for fetching all posts
+	 */
+	async getAllPosts(req: Request, res: Response): Promise<void> {
+		const posts = await this.postService.getSummariesByStates([
+			PostState.Hidden,
+			PostState.Published,
+			PostState.Deleted,
+		]);
 
 		res.status(200).json(new SuccessResponse().withPayload(posts));
 	}
@@ -149,6 +162,7 @@ export class PostController extends ControllerBase {
 			.get(this.catch(this.getPublishedPosts, this))
 			.post(
 				authenticate(this.tokenService, this.logger),
+				authorize(Role.User, Role.User),
 				validate(CreatePostDto),
 				this.catch(this.createPost, this),
 			);
@@ -160,6 +174,12 @@ export class PostController extends ControllerBase {
 			this.catch(this.getOwnPosts, this),
 		);
 
+		this.router.get(
+			'/all',
+			authenticate(this.tokenService, this.logger),
+			authorize(Role.Admin),
+		);
+
 		this.router
 			.route('/:id')
 			.get(
@@ -168,6 +188,7 @@ export class PostController extends ControllerBase {
 			)
 			.patch(
 				authenticate(this.tokenService, this.logger),
+				authorize(Role.User, Role.Admin),
 				validate(UpdatePostDto, true),
 				this.catch(this.updatePost, this),
 			);
