@@ -4,40 +4,135 @@
 			<mdb-card-title>
 				<h1 class="mb-3">{{ post.title }}</h1>
 			</mdb-card-title>
-			<mdb-card-text class="mb-3">
-				<h6>
+			<mdb-card-text
+				class="mb-3 w-100 d-flex flex-row justify-content-between"
+			>
+				<div class="d-flex flex-column">
+					<h6>
+						<mdb-icon
+							class="text-primary"
+							fas
+							icon="info-circle"
+						></mdb-icon>
+						Status:
+						<mdb-badge [color]="post.state | postStateColor">
+							{{ post.state | postStateText }}
+						</mdb-badge>
+					</h6>
+					<h6
+						class="d-inline-block"
+						[mdbTooltip]="
+							(post.createdAt | date: 'dd. MMM yyyy h:mm a') || ''
+						"
+						placement="right"
+					>
+						<mdb-icon
+							class="text-primary"
+							far
+							icon="calendar-alt"
+						></mdb-icon>
+						Written: {{ post.createdAt | dateAgo }}
+					</h6>
+					<h6>
+						<mdb-icon
+							class="text-primary"
+							far
+							icon="user-circle"
+						></mdb-icon>
+						Author: <i>{{ post.author.username }}</i>
+					</h6>
+				</div>
+				<div *auth="['user']" class="d-flex flex-column">
+					<ng-container *ngIf="isHidden(post)">
+						<ng-template
+							[ngTemplateOutlet]="publishBtn"
+						></ng-template>
+					</ng-container>
+					<ng-container *ngIf="isPublished(post) || isHidden(post)">
+						<ng-template
+							[ngTemplateOutlet]="deleteBtn"
+						></ng-template>
+					</ng-container>
+				</div>
+				<div *auth="['admin']" class="d-flex flex-column">
+					<ng-container *ngIf="!isPublished(post)">
+						<ng-template
+							[ngTemplateOutlet]="publishBtn"
+						></ng-template>
+					</ng-container>
+
+					<ng-container *ngIf="!isHidden(post)">
+						<ng-template [ngTemplateOutlet]="hideBtn"></ng-template>
+					</ng-container>
+
+					<ng-container *ngIf="!isDeleted(post)">
+						<ng-template
+							[ngTemplateOutlet]="deleteBtn"
+						></ng-template>
+					</ng-container>
+				</div>
+
+				<ng-template #publishBtn>
+					<button
+						mdbBtn
+						color="success"
+						[outline]="true"
+						size="sm"
+						(click)="updateState(post, 2)"
+					>
+						<mdb-icon
+							*ngIf="!applyingState; else loadingSpinner"
+							class="mr-1"
+							fas
+							icon="upload"
+						></mdb-icon>
+						Publish
+					</button>
+				</ng-template>
+
+				<ng-template #hideBtn>
+					<button
+						mdbBtn
+						color="elegant"
+						[outline]="true"
+						size="sm"
+						(click)="updateState(post, 1)"
+					>
+						<mdb-icon
+							*ngIf="!applyingState; else loadingSpinner"
+							class="mr-1"
+							far
+							icon="eye-slash"
+						></mdb-icon>
+						Hide
+					</button>
+				</ng-template>
+
+				<ng-template #deleteBtn>
+					<button
+						mdbBtn
+						color="danger"
+						[outline]="true"
+						size="sm"
+						(click)="updateState(post, 3)"
+					>
+						<mdb-icon
+							*ngIf="!applyingState; else loadingSpinner"
+							class="mr-1"
+							far
+							icon="trash-alt"
+						></mdb-icon>
+						Delete
+					</button>
+				</ng-template>
+
+				<ng-template #loadingSpinner>
 					<mdb-icon
-						class="text-primary"
+						[classInside]="'fa-spin'"
 						fas
-						icon="info-circle"
+						icon="spinner"
 					></mdb-icon>
-					Status:
-					<mdb-badge [color]="post.state | postStateColor">
-						{{ post.state | postStateText }}
-					</mdb-badge>
-				</h6>
-				<h6
-					class="d-inline-block"
-					[mdbTooltip]="
-						(post.createdAt | date: 'dd. MMM yyyy h:mm a') || ''
-					"
-					placement="right"
-				>
-					<mdb-icon
-						class="text-primary"
-						far
-						icon="calendar-alt"
-					></mdb-icon>
-					Written: {{ post.createdAt | dateAgo }}
-				</h6>
-				<h6>
-					<mdb-icon
-						class="text-primary"
-						far
-						icon="user-circle"
-					></mdb-icon>
-					Author: <i>{{ post.author.username }}</i>
-				</h6>
+				</ng-template>
 			</mdb-card-text>
 
 			<hr />

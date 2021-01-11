@@ -1,5 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { PostState } from '@data/enums';
 import { CreatePost, Post, PostSummary } from '@data/models';
 import { CreatedResponse } from '@data/models/createdResponse';
 import { environment } from '@env';
@@ -59,5 +60,18 @@ export class PostService {
 		const requestUrl = `${environment.apiBasePath}/posts`;
 
 		return this.httpClient.post<CreatedResponse>(requestUrl, post);
+	}
+
+	/**
+	 * Applies the provided state on the post with the given id
+	 * @param postId Id of the post which the state should applied on
+	 * @param state State which should be applied
+	 */
+	applyState(postId: string, state: PostState): Observable<void> {
+		const requestUrl = `${environment.apiBasePath}/posts/${postId}`;
+
+		return this.httpClient.patch<void>(requestUrl, {
+			state,
+		});
 	}
 }
