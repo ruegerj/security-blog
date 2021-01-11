@@ -12,6 +12,12 @@ export interface IPostService {
 	getSummariesByStates(states: PostState[]): Promise<PostSummaryDto[]>;
 
 	/**
+	 * Should return all post summaries for the author with the given id
+	 * @param userId Id of the user for which all posts should be fetched
+	 */
+	getSummariesByUserId(userId: string): Promise<PostSummaryDto[]>;
+
+	/**
 	 * Should return the detailed informations of the post with the given id
 	 * @param id Id of the requested post
 	 * @returns Found post or undefined

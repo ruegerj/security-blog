@@ -10,6 +10,7 @@ import { Tokens } from '@infrastructure/ioc';
 import { ILogger } from '@infrastructure/logger/interfaces';
 import {
 	authenticate,
+	authorize,
 	IAuthenticatedUserLocals,
 	IOptionalAuthenticatedUserLocals,
 	validate,
@@ -46,6 +47,17 @@ export class PostController extends ControllerBase {
 		const posts = await this.postService.getSummariesByStates([
 			PostState.Published,
 		]);
+
+		res.status(200).json(new SuccessResponse().withPayload(posts));
+	}
+
+	/**
+	 * Endpoint for fetching all own post
+	 */
+	async getOwnPosts(req: Request, res: Response): Promise<void> {
+		const { user } = res.locals as IAuthenticatedUserLocals;
+
+		const posts = await this.postService.getSummariesByUserId(user.id);
 
 		res.status(200).json(new SuccessResponse().withPayload(posts));
 	}
@@ -122,6 +134,13 @@ export class PostController extends ControllerBase {
 				validate(CreatePostDto),
 				this.catch(this.createPost, this),
 			);
+
+		this.router.get(
+			'/own',
+			authenticate(this.tokenService, this.logger),
+			authorize(Role.User, Role.Admin),
+			this.catch(this.getOwnPosts, this),
+		);
 
 		this.router
 			.route('/:id')

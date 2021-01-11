@@ -49,6 +49,32 @@ export class PostService implements IPostService {
 	}
 
 	/**
+	 * Should return all post summaries for the author with the given id
+	 * @param userId Id of the user for which all posts should be fetched
+	 */
+	async getSummariesByUserId(userId: string): Promise<PostSummaryDto[]> {
+		const getByUserIdUnit = this.uowFactory.create(false);
+		await getByUserIdUnit.begin();
+
+		const posts = await getByUserIdUnit.posts.getByAuthorId(userId);
+
+		await getByUserIdUnit.commit();
+
+		return posts.map((p) => {
+			return {
+				id: p.id,
+				title: p.title,
+				createdAt: p.createdAt,
+				state: p.status,
+				author: {
+					id: p.author.id,
+					username: p.author.username,
+				},
+			};
+		});
+	}
+
+	/**
 	 * Returns the detailed informations of the post with the given id
 	 * @param id Id of the requested post
 	 * @returns Found post or undefined
