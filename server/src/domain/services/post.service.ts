@@ -1,4 +1,4 @@
-import { Post, User } from '@data-access/entities';
+import { Post } from '@data-access/entities';
 import { IUnitOfWorkFactory } from '@data-access/uow/factory/interfaces';
 import { IUnitOfWork } from '@data-access/uow/interfaces';
 import {

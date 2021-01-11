@@ -12,3 +12,4 @@ export * from './authorSummary.dto';
 export * from './createPost.dto';
 export * from './postDetail.dto';
 export * from './updatePost.dto';
+export * from './createComment.dto';

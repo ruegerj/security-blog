@@ -5,3 +5,4 @@ export * from './token.service.if';
 export * from './challenge.service.if';
 export * from './sms.service.if';
 export * from './post.service.if';
+export * from './comment.service.if';
