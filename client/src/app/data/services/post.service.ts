@@ -24,6 +24,24 @@ export class PostService {
 	}
 
 	/**
+	 * Returns a collection of all post which the current user has written
+	 */
+	getOwnPosts(): Observable<PostSummary[]> {
+		const requestUrl = `${environment.apiBasePath}/posts/own`;
+
+		return this.httpClient.get<PostSummary[]>(requestUrl);
+	}
+
+	/**
+	 * Returns a colleciton of all posts
+	 */
+	getAllPosts(): Observable<PostSummary[]> {
+		const requestUrl = `${environment.apiBasePath}/posts/all`;
+
+		return this.httpClient.get<PostSummary[]>(requestUrl);
+	}
+
+	/**
 	 * Fetches the detailed post with the given id
 	 * @param id Id of the requested post
 	 */

@@ -4,17 +4,20 @@
 			<mdb-card-title class="mb-3">
 				<h4>
 					{{ post.title }}
-					<small class="d-inline-block align-text-top">
-						<mdb-badge
-							*ngIf="showState"
-							[color]="post.state | postStateColor"
-						>
-							{{ post.state | postStateText }}
-						</mdb-badge>
-					</small>
 				</h4>
 			</mdb-card-title>
 			<mdb-card-text>
+				<h6>
+					<mdb-icon
+						class="text-primary"
+						fas
+						icon="info-circle"
+					></mdb-icon>
+					Status:
+					<mdb-badge [color]="post.state | postStateColor">
+						{{ post.state | postStateText }}
+					</mdb-badge>
+				</h6>
 				<h6
 					[mdbTooltip]="
 						(post.createdAt | date: 'dd. MMM yyyy h:mm a') || ''
@@ -48,7 +51,7 @@
 				routerLinkActive="active"
 			>
 				<mdb-icon fas icon="book-open"></mdb-icon>
-				Read
+				View
 			</button>
 		</div>
 	</mdb-card-body>

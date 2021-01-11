@@ -16,6 +16,7 @@ import {
 	validate,
 } from '@infrastructure/middleware';
 import { SuccessResponse } from '@infrastructure/responses';
+import { compareSync } from 'bcrypt';
 import { Request, Response } from 'express';
 import { Inject, Service } from 'typedi';
 import { ControllerBase } from './controller.base';
@@ -57,7 +58,7 @@ export class PostController extends ControllerBase {
 	async getOwnPosts(req: Request, res: Response): Promise<void> {
 		const { user } = res.locals as IAuthenticatedUserLocals;
 
-		const posts = await this.postService.getSummariesByUserId(user.id);
+		const posts = await this.postService.getSummariesByUserId(user.subject);
 
 		res.status(200).json(new SuccessResponse().withPayload(posts));
 	}
