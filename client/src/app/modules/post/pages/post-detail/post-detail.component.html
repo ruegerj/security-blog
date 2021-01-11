@@ -1,5 +1,5 @@
 <div class="container">
-	<mdb-card *ngIf="post$ | async as post; else loading">
+	<mdb-card class="mb-4" *ngIf="post$ | async as post; else loading">
 		<mdb-card-body>
 			<mdb-card-title>
 				<h1 class="mb-3">{{ post.title }}</h1>
@@ -58,4 +58,8 @@
 			</h1>
 		</div>
 	</ng-template>
+
+	<ng-container *ngIf="post$ | async as post">
+		<app-comment-section [postId]="post.id"></app-comment-section>
+	</ng-container>
 </div>

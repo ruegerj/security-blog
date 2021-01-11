@@ -1,0 +1,19 @@
+<mdb-card>
+	<mdb-card-body>
+		<p>{{ comment.message }}</p>
+		<hr />
+		<small class="text-muted">
+			Written by
+			<mdb-icon class="text-primary" far icon="user-circle"></mdb-icon>
+			{{ comment.author.username }} -
+			<i
+				[mdbTooltip]="
+					(comment.createdAt | date: 'dd. MMM yyyy h:mm a') || ''
+				"
+				placement="right"
+			>
+				{{ comment.createdAt | dateAgo }}
+			</i>
+		</small>
+	</mdb-card-body>
+</mdb-card>

@@ -8,10 +8,23 @@ import { CKEditorModule } from '@ckeditor/ckeditor5-angular';
 import { PostDetailComponent } from './pages/post-detail/post-detail.component';
 import { PostStateColorPipe } from './pipes/post-state-color.pipe';
 import { PostStateTextPipe } from './pipes/post-state-text.pipe';
+import { CommentModule } from '@modules/comment/comment.module';
 
 @NgModule({
-	declarations: [PostSummaryComponent, CreatePostComponent, PostDetailComponent, PostStateColorPipe, PostStateTextPipe],
-	imports: [CommonModule, CKEditorModule, PostRoutingModule, SharedModule],
+	declarations: [
+		PostSummaryComponent,
+		CreatePostComponent,
+		PostDetailComponent,
+		PostStateColorPipe,
+		PostStateTextPipe,
+	],
+	imports: [
+		CommonModule,
+		CKEditorModule,
+		PostRoutingModule,
+		CommentModule,
+		SharedModule,
+	],
 	exports: [
 		// Shared components
 		PostSummaryComponent,

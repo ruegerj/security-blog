@@ -26,6 +26,7 @@ import { ILogger } from '@infrastructure/logger/interfaces';
 import {
 	AuthenticationController,
 	ChallengeController,
+	CommentController,
 	PostController,
 } from './controllers';
 import { NotFoundError } from '@infrastructure/errors';
@@ -110,6 +111,7 @@ export class App {
 			AuthenticationController,
 			ChallengeController,
 			PostController,
+			CommentController,
 		]);
 	}
 

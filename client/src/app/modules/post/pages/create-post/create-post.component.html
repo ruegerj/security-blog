@@ -38,8 +38,22 @@
 				color="primary"
 				[disabled]="newPostForm.invalid || creating"
 			>
-				<mdb-icon class="mr-1" fas icon="plus"></mdb-icon>
+				<mdb-icon
+					*ngIf="!creating; else creatingBtn"
+					class="mr-1"
+					fas
+					icon="plus"
+				></mdb-icon>
 				Create
+
+				<ng-template #creatingBtn>
+					<mdb-icon
+						class="text-primary"
+						[classInside]="'fa-spin'"
+						fas
+						icon="spinner"
+					></mdb-icon>
+				</ng-template>
 			</button>
 		</form>
 	</mdb-card-body>

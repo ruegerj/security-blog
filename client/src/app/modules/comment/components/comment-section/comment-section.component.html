@@ -1,0 +1,81 @@
+<mdb-card>
+	<mdb-card-body>
+		<mdb-card-title class="d-flex flex-row justify-content-between">
+			<h3 class="mt-2">
+				<mdb-icon
+					class="text-primary mr-1"
+					far
+					icon="comment-alt"
+				></mdb-icon>
+				Comments
+			</h3>
+			<button mdbBtn size="md" (click)="refreshComments()">
+				<mdb-icon class="text-primary" fas icon="redo-alt"></mdb-icon>
+				Refresh
+			</button>
+		</mdb-card-title>
+
+		<ng-container *ngIf="comments$ | async as comments; else loading">
+			<div
+				class="row mb-4 container-fluid"
+				*ngFor="let comment of comments"
+			>
+				<app-comment class="w-100" [comment]="comment"></app-comment>
+			</div>
+		</ng-container>
+
+		<ng-template #loading>
+			<div class="d-flex flex-row justify-content-center">
+				<h1>
+					<mdb-icon
+						class="text-primary"
+						[classInside]="'fa-spin'"
+						fas
+						icon="spinner"
+					></mdb-icon>
+				</h1>
+			</div>
+		</ng-template>
+
+		<div *auth>
+			<app-alert [alertId]="alertId" [fade]="true"></app-alert>
+
+			<form (ngSubmit)="createComment()" [formGroup]="commentForm">
+				<div class="form-group">
+					<label for="messageInput">Message</label>
+					<textarea
+						id="messageInput"
+						class="md-textarea form-control"
+						formControlName="message"
+					></textarea>
+					<app-validation-errors
+						[control]="messageControl"
+					></app-validation-errors>
+				</div>
+
+				<button
+					mdbBtn
+					color="primary"
+					class="ml-0"
+					[disabled]="this.commentForm.invalid || creatingComment"
+				>
+					<mdb-icon
+						*ngIf="!creatingComment; else commentingBtn"
+						class="mr-1"
+						fas
+						icon="plus"
+					></mdb-icon>
+					<ng-template #commentingBtn>
+						<mdb-icon
+							class="text-primary"
+							[classInside]="'fa-spin'"
+							fas
+							icon="spinner"
+						></mdb-icon>
+					</ng-template>
+					Comment
+				</button>
+			</form>
+		</div>
+	</mdb-card-body>
+</mdb-card>

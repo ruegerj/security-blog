@@ -78,11 +78,6 @@ export class CommentController extends ControllerBase {
 				this.catch(this.createComment, this),
 			);
 
-		this.router.get(
-			'/post/:postId',
-			authenticate(this.tokenService, this.logger),
-			authorize(Role.User, Role.Admin),
-			this.catch(this.getForPost, this),
-		);
+		this.router.get('/post/:postId', this.catch(this.getForPost, this));
 	}
 }
