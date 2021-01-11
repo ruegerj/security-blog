@@ -1,7 +1,7 @@
 import { Comment } from '@data-access/entities';
 import { IUnitOfWorkFactory } from '@data-access/uow/factory/interfaces';
 import { IUnitOfWork } from '@data-access/uow/interfaces';
-import { CreateCommentDto } from '@domain/dtos';
+import { CommentSummaryDto, CreateCommentDto } from '@domain/dtos';
 import { NotFoundError } from '@infrastructure/errors';
 import { Tokens } from '@infrastructure/ioc';
 import { ILogger } from '@infrastructure/logger/interfaces';
@@ -20,6 +20,33 @@ export class CommentService implements ICommentService {
 		@Inject(Tokens.ILogger)
 		private logger: ILogger,
 	) {}
+
+	/**
+	 * Should return all comment summaries of the post whith the given id
+	 * @param postId Id of the post whose comments are requested
+	 */
+	async getSummariesByPostId(postId: string): Promise<CommentSummaryDto[]> {
+		const getSummariesUnit = this.uowFactory.create(false);
+		await getSummariesUnit.begin();
+
+		const posts = await getSummariesUnit.comments.getByPostIdWithAuthor(
+			postId,
+		);
+
+		await getSummariesUnit.commit();
+
+		return posts.map((p) => {
+			return {
+				id: p.id,
+				createdAt: p.timestamp,
+				message: p.message,
+				author: {
+					id: p.author.id,
+					username: p.author.username,
+				},
+			};
+		});
+	}
 
 	/**
 	 * Creates a new comment according to the provided model

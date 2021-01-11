@@ -7,4 +7,19 @@ import { RepositoryBase } from './repository.base';
  */
 export class CommentRepository
 	extends RepositoryBase<Comment>
-	implements ICommentRepository {}
+	implements ICommentRepository {
+	/**
+	 * Returns all comments of the post with the given id including their authors
+	 * @param postId Id of the post whose comments are requested
+	 */
+	getByPostIdWithAuthor(postId: string): Promise<Comment[]> {
+		return this.repository.find({
+			relations: ['author', 'post'],
+			where: {
+				post: {
+					id: postId,
+				},
+			},
+		});
+	}
+}
