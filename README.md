@@ -96,9 +96,34 @@ The application comes with two pre configured user accounts: one for the admin- 
 
 ## Passwords
 
+This section covers the approach for storing passwords in this application and the used password policy.
+
 ### Storage
 
+Before a password is persisted, it goes through the following steps:
+
+-   [SHA-512](https://en.wikipedia.org/wiki/SHA-2):  
+     The incoming plain text password will first be hashed using the SHA-512 algorythm. This adds the benefit of an always consistent output while consuming very little time.
+-   [bcrypt](https://en.wikipedia.org/wiki/Bcrypt):  
+     The ouput of the of the preceeding step (SHA-512) will now be salted and hashed using the bcrypt algorythm. Bcrypt is an excellent choice for this job because its a slow hashing algorithm whose time/iteration cost can be configured. With a consistent input length ensured, the time factor can be tuned much more effectively.
+
+    In this app the cost factor is set to _12_ which translates to 4'096 hashing iterations. As this [post](http://security.stackexchange.com/a/83382) nicely displays it is equivalent to arround 250ms on an Intel i7 9700k CPU. The consumed time of approximately 250ms add a solid artifical deceleration while have not having a to big impact on the UX.
+
+This concept of storing a password is huegely inspired by the approach [Dropbox](https://www.dropbox.com/en/) uses:
+
+    Plain text => SHA-512 => bcrypt salt => AES256 pepper
+
+Alltough the [pepper](<https://en.wikipedia.org/wiki/Pepper_(cryptography)>) adds an addiontal security layer ontop the others and protects against potential database leaks ([dictionary attacks](https://en.wikipedia.org/wiki/Dictionary_attack)), it was deliberately ommited in this project. The reason behind this was the huge amount of work which would have been nescessary to implement a solid key rotation system used for the pepper private keys. This issue is nicely clarified in this Stack Overflow [post](https://stackoverflow.com/a/16896216).
+
 ### Policy
+
+The used password policy for this app uses the [rules](https://docs.microsoft.com/en-us/windows/security/threat-protection/security-policy-settings/password-must-meet-complexity-requirements) recommended by Microsoft for Windows account credentials. The following conditions have to be fullfilled for a valid password:
+
+-   Consists of atleast ten characters
+-   Contains atleast one lowercase character (a-z)
+-   Contains atleast one upperchase character (A-z)
+-   Contains atleast one digit (0-9)
+-   Contains atleast one non alphanumeric character (~!@#\$%^&\*\_-+=`|\(){}[]:;"'<>,.?/)
 
 ## Logging
 
