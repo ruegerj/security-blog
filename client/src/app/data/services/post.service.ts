@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { CreatePost, PostSummary } from '@data/models';
+import { CreatePost, Post, PostSummary } from '@data/models';
 import { CreatedResponse } from '@data/models/createdResponse';
 import { environment } from '@env';
 import { Observable } from 'rxjs';
@@ -21,6 +21,16 @@ export class PostService {
 		const requestUrl = `${environment.apiBasePath}/posts`;
 
 		return this.httpClient.get<PostSummary[]>(requestUrl);
+	}
+
+	/**
+	 * Fetches the detailed post with the given id
+	 * @param id Id of the requested post
+	 */
+	getById(id: string): Observable<Post> {
+		const requestUrl = `${environment.apiBasePath}/posts/${id}`;
+
+		return this.httpClient.get<Post>(requestUrl);
 	}
 
 	/**

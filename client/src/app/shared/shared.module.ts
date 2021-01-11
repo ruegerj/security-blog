@@ -6,7 +6,7 @@ import { MDBBootstrapModule } from 'angular-bootstrap-md';
 import { ValidationErrorsComponent } from './components/validation-errors/validation-errors.component';
 import { AlertComponent } from './components/alert/alert.component';
 import { AuthDirective } from './directives';
-import { DateAgoPipe } from './pipes';
+import { DateAgoPipe, UnescapePipe } from './pipes';
 
 @NgModule({
 	declarations: [
@@ -14,6 +14,7 @@ import { DateAgoPipe } from './pipes';
 		AlertComponent,
 		AuthDirective,
 		DateAgoPipe,
+		UnescapePipe,
 	],
 	imports: [
 		CommonModule,
@@ -37,6 +38,7 @@ import { DateAgoPipe } from './pipes';
 		AuthDirective,
 		// Shared pipes
 		DateAgoPipe,
+		UnescapePipe,
 	],
 })
 export class SharedModule {}

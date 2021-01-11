@@ -9,16 +9,18 @@ import { NextFunction, Request, RequestHandler, Response } from 'express';
  * if the autthentication was successful the user information will be added to the `res.locals`
  * @param tokenService TokenService instance for validating access tokens
  * @param logger Logging instance which should be used
+ * @param fail Boolean which specifies if the middleware should fail if the authentiacation  fails
  */
 export function authenticate(
 	tokenService: ITokenService,
 	logger: ILogger,
+	fail = true,
 ): RequestHandler {
 	return async (req: Request, res: Response, next: NextFunction) => {
 		const authorizationHeader = req.headers.authorization;
 
 		// No authorization header received => abort request
-		if (!authorizationHeader) {
+		if (!authorizationHeader && fail) {
 			logger.warn(
 				'Failed authentication due to missing Authorization header',
 			);
@@ -36,7 +38,7 @@ export function authenticate(
 		const headerMatch = authorizationHeader.match(headerPattern);
 
 		// Header doesn't comes in expected pattern => abort request
-		if (!headerMatch) {
+		if (!headerMatch && fail) {
 			logger.warn(
 				'Failed authentication due to malformed authorization header',
 			);
@@ -48,14 +50,14 @@ export function authenticate(
 			);
 		}
 
-		const accessToken = headerMatch[1]; // First match group => token
+		const accessToken = headerMatch ? headerMatch[1] : null; // First match group => token
 
 		const validatedToken = await tokenService.verifyAccessToken(
 			accessToken,
 		);
 
 		// Invalid access token => abort request
-		if (!validatedToken.valid) {
+		if (!validatedToken.valid && fail) {
 			logger.warn(
 				`Failed authentication due to invalid access token, reason: ${validatedToken.reason}`,
 			);
@@ -82,4 +84,15 @@ export interface IAuthenticatedUserLocals extends Record<string, unknown> {
 	 * Data about the authenticated user which submitted the current request
 	 */
 	user: IAccessToken;
+}
+
+/**
+ * Interface for the `res.locals` after the `authenticate()` middlware was ran but `fail` was `false`
+ */
+export interface IOptionalAuthenticatedUserLocals
+	extends Record<string, unknown> {
+	/**
+	 * Eventual data about the authenticated user which submitted the current request
+	 */
+	user?: IAccessToken;
 }

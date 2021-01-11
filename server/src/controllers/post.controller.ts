@@ -11,6 +11,7 @@ import { ILogger } from '@infrastructure/logger/interfaces';
 import {
 	authenticate,
 	IAuthenticatedUserLocals,
+	IOptionalAuthenticatedUserLocals,
 	validate,
 } from '@infrastructure/middleware';
 import { SuccessResponse } from '@infrastructure/responses';
@@ -54,7 +55,7 @@ export class PostController extends ControllerBase {
 	 */
 	async getById(req: Request, res: Response): Promise<void> {
 		const postId = req.params.id;
-		const { user } = res.locals as IAuthenticatedUserLocals;
+		const { user } = res.locals as IOptionalAuthenticatedUserLocals;
 
 		if (!postId) {
 			throw new BadRequestError('Missing post id');
@@ -66,11 +67,21 @@ export class PostController extends ControllerBase {
 			throw new NotFoundError('Could not find requested post');
 		}
 
+		// Forbid if anonymous user and post no published
+		if (!user && post.state !== PostState.Published) {
+			this.logger.warn(
+				`Prohibited anonymous user access to the post: ${post.id}`,
+				post.id,
+			);
+
+			throw new ForbiddenError("Your aren't allowed to see this post");
+		}
+
 		// Check if user is allowed to see the post
 		if (
-			post.author.id != user.subject &&
+			post.author.id != user?.subject &&
 			post.state !== PostState.Published &&
-			!user.roles.includes(Role.Admin)
+			!user?.roles.includes(Role.Admin)
 		) {
 			this.logger.warn(
 				`Prohibited user: ${user.email} access to the post: ${post.id}`,
@@ -115,7 +126,7 @@ export class PostController extends ControllerBase {
 		this.router
 			.route('/:id')
 			.get(
-				authenticate(this.tokenService, this.logger),
+				authenticate(this.tokenService, this.logger, false),
 				this.catch(this.getById, this),
 			);
 	}

@@ -23,36 +23,4 @@ export class PostSummaryComponent implements OnInit {
 	constructor() {}
 
 	ngOnInit(): void {}
-
-	lookUpColor(state: PostState): string {
-		switch (state) {
-			case PostState.Published:
-				return 'green';
-
-			case PostState.Hidden:
-				return 'grey darken-1';
-
-			case PostState.Deleted:
-				return 'red';
-
-			default:
-				return '';
-		}
-	}
-
-	lookUpTitle(state: PostState): string {
-		switch (state) {
-			case PostState.Published:
-				return 'Published';
-
-			case PostState.Hidden:
-				return 'Hidden';
-
-			case PostState.Deleted:
-				return 'Deleted';
-
-			default:
-				return '';
-		}
-	}
 }

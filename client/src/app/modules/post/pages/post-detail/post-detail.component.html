@@ -1,0 +1,61 @@
+<div class="container">
+	<mdb-card *ngIf="post$ | async as post; else loading">
+		<mdb-card-body>
+			<mdb-card-title>
+				<h1 class="mb-3">{{ post.title }}</h1>
+			</mdb-card-title>
+			<mdb-card-text class="mb-3">
+				<h6>
+					<mdb-icon
+						class="text-primary"
+						fas
+						icon="info-circle"
+					></mdb-icon>
+					Status:
+					<mdb-badge [color]="post.state | postStateColor">
+						{{ post.state | postStateText }}
+					</mdb-badge>
+				</h6>
+				<h6
+					class="d-inline-block"
+					[mdbTooltip]="
+						(post.createdAt | date: 'dd. MMM yyyy h:mm a') || ''
+					"
+					placement="right"
+				>
+					<mdb-icon
+						class="text-primary"
+						far
+						icon="calendar-alt"
+					></mdb-icon>
+					Written: {{ post.createdAt | dateAgo }}
+				</h6>
+				<h6>
+					<mdb-icon
+						class="text-primary"
+						far
+						icon="user-circle"
+					></mdb-icon>
+					Author: <i>{{ post.author.username }}</i>
+				</h6>
+			</mdb-card-text>
+
+			<hr />
+
+			<div class="mt-3" [innerHTML]="post.content | unescape"></div>
+		</mdb-card-body>
+	</mdb-card>
+
+	<ng-template #loading>
+		<div class="w-100 text-center">
+			<h1>
+				<mdb-icon
+					class="text-primary"
+					[classInside]="'fa-spin'"
+					fas
+					icon="spinner"
+				></mdb-icon>
+			</h1>
+		</div>
+	</ng-template>
+</div>

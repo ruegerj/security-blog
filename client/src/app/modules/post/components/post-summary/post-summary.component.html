@@ -7,9 +7,9 @@
 					<small class="d-inline-block align-text-top">
 						<mdb-badge
 							*ngIf="showState"
-							[color]="lookUpColor(post.state)"
+							[color]="post.state | postStateColor"
 						>
-							{{ lookUpTitle(post.state) }}
+							{{ post.state | postStateText }}
 						</mdb-badge>
 					</small>
 				</h4>
@@ -44,7 +44,7 @@
 				mdbBtn
 				color="primary"
 				[outline]="true"
-				[routerLink]="['posts', post.id]"
+				[routerLink]="['/post', post.id]"
 				routerLinkActive="active"
 			>
 				<mdb-icon fas icon="book-open"></mdb-icon>

@@ -5,9 +5,12 @@ import { PostSummaryComponent } from './components/post-summary/post-summary.com
 import { CreatePostComponent } from './pages/create-post/create-post.component';
 import { PostRoutingModule } from './post.routing';
 import { CKEditorModule } from '@ckeditor/ckeditor5-angular';
+import { PostDetailComponent } from './pages/post-detail/post-detail.component';
+import { PostStateColorPipe } from './pipes/post-state-color.pipe';
+import { PostStateTextPipe } from './pipes/post-state-text.pipe';
 
 @NgModule({
-	declarations: [PostSummaryComponent, CreatePostComponent],
+	declarations: [PostSummaryComponent, CreatePostComponent, PostDetailComponent, PostStateColorPipe, PostStateTextPipe],
 	imports: [CommonModule, CKEditorModule, PostRoutingModule, SharedModule],
 	exports: [
 		// Shared components
