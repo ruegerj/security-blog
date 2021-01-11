@@ -163,6 +163,13 @@ export class App {
 		// For config see: https://helmetjs.github.io/
 		this.app.use(helmet());
 
+		// Set X-Frame-Options to deny
+		this.app.use(
+			helmet.frameguard({
+				action: 'deny',
+			}),
+		);
+
 		// Set and configure content security policy
 		this.app.use(
 			helmet.contentSecurityPolicy({
