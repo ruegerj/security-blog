@@ -60,7 +60,13 @@ export class PostController extends ControllerBase {
 
 		const posts = await this.postService.getSummariesByUserId(user.subject);
 
-		res.status(200).json(new SuccessResponse().withPayload(posts));
+		const nonDeletedPosts = posts.filter(
+			(p) => p.state !== PostState.Deleted,
+		);
+
+		res.status(200).json(
+			new SuccessResponse().withPayload(nonDeletedPosts),
+		);
 	}
 
 	/**
