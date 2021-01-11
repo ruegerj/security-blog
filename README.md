@@ -9,7 +9,7 @@ School project for realizing a small blog web app in the context of the module M
     -   [Build Application](#build-application)
     -   [Run Application](#run-application)
     -   [User Acounts](#user-accounts)
--   [Security](#security)
+-   [XSS Protection](#xss-protection)
 -   [Passwords](#passwords)
     -   [Storage](#storage)
     -   [Policy](#policy)
@@ -94,7 +94,9 @@ The application comes with two pre configured user accounts: one for the admin- 
 
 **Note**: The phone numbers assigned to this users are just placeholders. In order to be able to use one account you have to replace its phone number in the database with your own. A rather convenient tool for this purposer is the [DB Browser for SQLite](https://sqlitebrowser.org/).
 
-## Security
+## XSS Protection
+
+On the API the middleware [xss-clean](https://npmjs.com/package/xss-clean) is used to sanitize all incoming data (request params and request body). Therefore any content wich is save into the database will be satitized automatically. On the client, angular takes care of everything. Because only angular manipulates the DOM its DOM sanitizer ensures, that all scripts are removed, before rendered. Even when HTML is set using the `innerHTML` directive (like on the post detail page) all malicious scripts would be automatically removed and therefore prevented form execution.
 
 ## Passwords
 
