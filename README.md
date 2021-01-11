@@ -127,8 +127,20 @@ The used password policy for this app uses the [rules](https://docs.microsoft.co
 
 ## Logging
 
+This section covers the used logging policy and how it was implemented.
+
 ### Policy
 
+In the api (server) every event should be logged, which could be useful for any later investigation. The types of such an investigation could vary from performance improvement (e.g. lag spikes), error monitoring, api calls or security incidents. However, care must be taken to ensure that sensitive data (user data, credentials, tokens etc.) is not accidentally logged, which could lead to possible leaks. The following log levels are defined and should be used as specified:
+
+-   **Trace**: should only used for information which is useful to pinpoint sepcific parts of a funciontality (code)
+-   **Debug**: should be used for diagnostic information wich is useful for the developers or the system administrators
+-   **Info**: should be used for general information about the ongoing events while the application is running
+-   **Warn**: should be used for information about incidents from which the app manged to recover itself but could lead to odd behaviour. Additionaly all security relevant information should be logged with this level (e.g. failed login attempt, failed authorization on a resourec etc.)
+-   **Error**: should be used for information about application errors which have occured.
+
 ### Implementation
+
+An application wide logger is implement using the [winston](https://github.com/winstonjs/winston) logger under the hood. It's currently configured to log into a log file, but could be easily extended for delegating the logs into a database. In combination, [morgan](https://github.com/expressjs/morgan) is used to log any request on the api.
 
 ## Libraries
