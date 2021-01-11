@@ -179,6 +179,7 @@ export class PostController extends ControllerBase {
 			'/all',
 			authenticate(this.tokenService, this.logger),
 			authorize(Role.Admin),
+			this.catch(this.getAllPosts, this),
 		);
 
 		this.router

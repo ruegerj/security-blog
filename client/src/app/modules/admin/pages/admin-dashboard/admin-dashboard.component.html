@@ -1,0 +1,30 @@
+<h2>
+	All Posts
+	<button mdbBtn size="md" class="mb-3" (click)="fetchPosts()">
+		<mdb-icon class="text-primary" fas icon="redo-alt"></mdb-icon>
+		Refresh
+	</button>
+</h2>
+
+<ng-container *ngIf="posts$ | async as posts; else loading">
+	<div class="row mb-4 container-fluid" *ngFor="let post of posts">
+		<app-post-summary
+			[post]="post"
+			[showState]="true"
+			class="w-100"
+		></app-post-summary>
+	</div>
+</ng-container>
+
+<ng-template #loading>
+	<div class="row w-100 flex-row justify-content-center">
+		<h1>
+			<mdb-icon
+				class="text-primary"
+				[classInside]="'fa-spin'"
+				fas
+				icon="spinner"
+			></mdb-icon>
+		</h1>
+	</div>
+</ng-template>
