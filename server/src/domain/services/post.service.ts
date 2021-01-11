@@ -1,9 +1,19 @@
-import { Post } from '@data-access/entities';
+import { Post, User } from '@data-access/entities';
 import { IUnitOfWorkFactory } from '@data-access/uow/factory/interfaces';
 import { IUnitOfWork } from '@data-access/uow/interfaces';
-import { CreatePostDto, PostDetailDto, PostSummaryDto } from '@domain/dtos';
-import { PostState } from '@domain/dtos/enums';
-import { BadRequestError } from '@infrastructure/errors';
+import {
+	CreatePostDto,
+	PostDetailDto,
+	PostSummaryDto,
+	UpdatePostDto,
+} from '@domain/dtos';
+import { PostState, Role } from '@domain/dtos/enums';
+import { IAccessToken } from '@domain/dtos/interfaces';
+import {
+	BadRequestError,
+	ForbiddenError,
+	NotFoundError,
+} from '@infrastructure/errors';
 import { Tokens } from '@infrastructure/ioc';
 import { ILogger } from '@infrastructure/logger/interfaces';
 import { Inject, Service } from 'typedi';
@@ -149,5 +159,100 @@ export class PostService implements IPostService {
 
 			throw error;
 		}
+	}
+
+	/**
+	 * Updates the post with the given id accordingly to the provided model
+	 * @param id Id of the post which should be updated
+	 * @param model Model containing the new data for the post
+	 * @param currentUser Current user which tries to update the post
+	 */
+	async update(
+		id: string,
+		model: UpdatePostDto,
+		currentUser: IAccessToken,
+	): Promise<void> {
+		let updateUnit: IUnitOfWork;
+
+		try {
+			updateUnit = this.uowFactory.create(true);
+			await updateUnit.begin();
+
+			const post = await updateUnit.posts.getByIdWithAuthor(id);
+
+			if (!post) {
+				throw new NotFoundError("Specified post couldn't be found");
+			}
+
+			// Check if current user is author or admin
+			if (
+				this.isUserRole(currentUser) &&
+				!this.isAdminRole(currentUser) &&
+				!this.isAuthor(post, currentUser)
+			) {
+				this.logger.warn(
+					`User ${currentUser.email} attempted to update post: ${post.id} from the author: ${post.author.email}`,
+					post,
+					currentUser.subject,
+				);
+
+				throw new ForbiddenError(
+					"You aren't allowed to update this request",
+				);
+			}
+
+			// Check if state update is requested
+			if (model.state) {
+				// Check if new state update isn't pohibited (backwards e.g. Pblished -> Hidden)
+				if (
+					this.isUserRole(currentUser) &&
+					!this.isAdminRole(currentUser) &&
+					model.state < post.status
+				) {
+					this.logger.warn(
+						`User ${currentUser.email} attempted to set the state from the post: ${post.id} from ${post.status} to ${model.state}`,
+						post,
+						currentUser.subject,
+					);
+
+					throw new ForbiddenError(
+						"You aren't allowed to apply this state",
+					);
+				}
+
+				// Everything ok => either admin or forward update by author
+				post.status = model.state;
+
+				await updateUnit.posts.update(post);
+			}
+
+			await updateUnit.commit();
+
+			this.logger.info(
+				`User ${currentUser.email} updated the post: ${post.id}`,
+				post,
+				currentUser.subject,
+			);
+		} catch (error) {
+			this.logger.error('Failed to update a post', error);
+
+			await updateUnit?.rollback();
+
+			throw error;
+		}
+	}
+
+	// Authorization Helpers
+
+	private isAuthor(post: Post, user: IAccessToken): boolean {
+		return post.author.id === user.subject;
+	}
+
+	private isUserRole(user: IAccessToken): boolean {
+		return user.roles.some((r) => r == Role.User);
+	}
+
+	private isAdminRole(user: IAccessToken): boolean {
+		return user.roles.some((r) => r == Role.Admin);
 	}
 }

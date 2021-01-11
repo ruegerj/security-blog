@@ -1,4 +1,4 @@
-import { CreatePostDto } from '@domain/dtos';
+import { CreatePostDto, UpdatePostDto } from '@domain/dtos';
 import { PostState, Role } from '@domain/dtos/enums';
 import { IPostService, ITokenService } from '@domain/services/interfaces';
 import {
@@ -125,6 +125,24 @@ export class PostController extends ControllerBase {
 		);
 	}
 
+	/**
+	 * Endpoint for updating posts
+	 */
+	async updatePost(req: Request, res: Response): Promise<void> {
+		const { user } = res.locals as IAuthenticatedUserLocals;
+		const postId = req.params.id;
+
+		if (!postId) {
+			throw new BadRequestError('Missing post id');
+		}
+
+		const updateModel = req.body as UpdatePostDto;
+
+		await this.postService.update(postId, updateModel, user);
+
+		res.status(204).send();
+	}
+
 	initializeRoutes(): void {
 		this.router
 			.route('/')
@@ -147,6 +165,11 @@ export class PostController extends ControllerBase {
 			.get(
 				authenticate(this.tokenService, this.logger, false),
 				this.catch(this.getById, this),
+			)
+			.patch(
+				authenticate(this.tokenService, this.logger),
+				validate(UpdatePostDto, true),
+				this.catch(this.updatePost, this),
 			);
 	}
 }

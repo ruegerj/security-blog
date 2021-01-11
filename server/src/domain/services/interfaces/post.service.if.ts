@@ -1,5 +1,11 @@
-import { CreatePostDto, PostDetailDto, PostSummaryDto } from '@domain/dtos';
+import {
+	CreatePostDto,
+	PostDetailDto,
+	PostSummaryDto,
+	UpdatePostDto,
+} from '@domain/dtos';
 import { PostState } from '@domain/dtos/enums';
+import { IAccessToken } from '@domain/dtos/interfaces';
 
 /**
  * Interface for a service which handles post related operations
@@ -30,4 +36,16 @@ export interface IPostService {
 	 * @returns Id of the created post
 	 */
 	create(model: CreatePostDto): Promise<string>;
+
+	/**
+	 * Should update the post with the given id accordingly to the provided model
+	 * @param id Id of the post which should be updated
+	 * @param model Model containing the new data for the post
+	 * @param currentUser Current user which tries to update the post
+	 */
+	update(
+		id: string,
+		model: UpdatePostDto,
+		currentUser: IAccessToken,
+	): Promise<void>;
 }
